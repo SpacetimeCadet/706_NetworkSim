@@ -38,12 +38,14 @@ class Network():
            for i in removed:
                self.removeLink(i)
         
-    # this method will create a link in the form [nodeSource, nodeDestination, Weight]
+    # this method will create a link as long as it is not already in the list
+    # todo: check permutations
     def addLink(self, link):
         if not (link in self.links):
             self.links.append(link)
 
     # this method will delete a link as long as it is found in the list.
+    # todo: check permutations
     def removeLink(self, link):
         if link in self.links:
             self.links.remove(link)
