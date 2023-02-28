@@ -3,6 +3,7 @@ class Network():
         self.nodes = nodes # A list of numeric identifiers for the nodes of the network.
         self.links = links # A list of triples in the form [nodeSource, nodeDestination, Weight].
 
+    # THIS METHOD IS NOT YET COMPLETE
     def generateNetwork(self, size):
             self.nodes = []
             self.nodes = [n for n in range(size)]
