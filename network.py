@@ -1,4 +1,4 @@
-class Network:
+class Network():
     def __init__(self, nodes, links, weights):
         self.nodes = nodes
         self.links = links
