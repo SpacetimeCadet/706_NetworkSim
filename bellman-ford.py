@@ -1,9 +1,17 @@
 import sys
-# from heapq import heapify, heappush, heappop
-
 # finds the shortest distance from the source node 
 # to all of the nodes until reaches the destination 
 # dynamic programming <-- store results of sub problems
+
+# Bellman-form equation (adjustment): 
+# if: cost(source node) + weight-of-edge < cost(dest)
+#               |                    |        |
+#               |                    |     (cost from specific source to destination)
+#     (cost of reaching source node) |
+#                           (cost of reaching the destination node)
+# then: cost(dest) = cost(source node) + weight-of-edge
+# apply adjustment for all the edges of the graph
+
 def bellman_ford(graph, src, dest):
 
     # create infinite variable
@@ -44,7 +52,7 @@ def bellman_ford(graph, src, dest):
                         # update the predecessor nodes list of the itr nodes
                         node[neighbor]['pred'] = node[itr]['pred'] + list(itr)
                     else:
-                        # clear the previous cost if smaller cost is found
+                        # clears the previous cost if smaller cost is found
                         node[itr]['pred'].clear()
                         node[neighbor]['pred'] = node[itr]['pred'] + list(itr)
         print(node)
@@ -52,15 +60,6 @@ def bellman_ford(graph, src, dest):
     # printing predecessor path
     print("Shortest Path: "+ str(node[dest]['pred'] + list(dest)))
 
-
-# Bellman-form equation (adjustment): 
-# if: cost(source node) + weight-of-edge < cost(dest)
-#               |                    |        |
-#               |                    |     (cost from specific source to destination)
-#     (cost of reaching source node) |
-#                           (cost of reaching the destination node)
-# then: cost(dest) = cost(source node) + weight-of-edge
-# apply adjustment for all the edges of the graph
 
 if __name__ == "__main__":
 
