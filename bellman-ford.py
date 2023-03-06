@@ -65,6 +65,7 @@ def bellman_ford(graph, src, dest):
 if __name__ == "__main__":
 
     # cost of neighbor edges
+    # an example
     graph = {
         'A':{'B':6,'C':4,'D':5},
         'B':{'E':-1},
@@ -74,6 +75,7 @@ if __name__ == "__main__":
         'F':{}
     }
 
+# Try with different nodes
 source = 'A'
 destination = 'E'
 bellman_ford(graph, source, destination)
