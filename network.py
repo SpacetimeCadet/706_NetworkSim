@@ -1,3 +1,5 @@
+import copy
+
 class Network():
     def __init__(self, nodes, links):
         self.nodes = nodes # A list of numeric identifiers for the nodes of the network.
@@ -13,6 +15,20 @@ class Network():
                 # randomly assign links between nodes
                 # nested loop or linear approach?
 
+
+    # this method returns the network formatted into a dictionary
+    def toDictionary(self):
+        dict = {}
+        links = copy.deepcopy(self.links)
+        for i in self.nodes:
+            list = self.specGetLinksOf(i, links)
+            connections = {}
+            for j in list:
+                connections[j[1]] = j[2]
+                self.specRemoveLink(j, links)
+            dict[i] = connections
+        return dict
+
     # this method returns a list of links containing the specified node.
     def getLinksOf(self, node):
         l = []
@@ -20,7 +36,7 @@ class Network():
             if i[0] == node or i[1] == node: # we only want 0 and 1, since 2 is Weight.
                 l.append(i)
         return l
-    
+        
     # this method will create a node as long as it is not already in the list.
     # the list is resorted in ascending order.
     def addNode(self, node):
@@ -51,7 +67,17 @@ class Network():
             self.links.remove(link)
 
     
+    # BELOW IS HELPER FUNCTIONS FOR THE NETWORK CLASS #
+    def specGetLinksOf(self, node, links):
+        l = []
+        for i in links:
+            if i[0] == node or i[1] == node: # we only want 0 and 1, since 2 is Weight.
+                l.append(i)
+        return l
     
+    def specRemoveLink(self, link, links):
+        if link in links:
+            links.remove(link)
 
         
     

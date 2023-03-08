@@ -12,6 +12,12 @@ print(n.nodes)
 print(n.links)
 print("- - - - -")
 
+print("- - - - -")
+print("toDictionary")
+temp = n.toDictionary()
+print (temp)
+print("- - - - -")
+
 print("Links Containing Node #2")
 print(n.getLinksOf(2)) # the list of links containing node #2
 print("- - - - -")
