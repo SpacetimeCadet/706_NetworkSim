@@ -67,7 +67,7 @@ class Network():
             self.links.remove(link)
 
     
-    # BELOW IS HELPER FUNCTIONS FOR THE NETWORK CLASS #
+    # BELOW ARE HELPER FUNCTIONS FOR THE NETWORK CLASS #
     def specGetLinksOf(self, node, links):
         l = []
         for i in links:
