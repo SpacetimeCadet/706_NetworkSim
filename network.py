@@ -21,11 +21,11 @@ class Network():
         dict = {}
         links = copy.deepcopy(self.links)
         for i in self.nodes:
-            list = self.specGetLinksOf(i, links)
+            list = self.scGetLinksOf(i, links)
             connections = {}
             for j in list:
                 connections[j[1]] = j[2]
-                self.specRemoveLink(j, links)
+                self.scRemoveLink(j, links)
             dict[i] = connections
         return dict
 
@@ -68,14 +68,14 @@ class Network():
 
     
     # BELOW ARE HELPER FUNCTIONS FOR THE NETWORK CLASS #
-    def specGetLinksOf(self, node, links):
+    def scGetLinksOf(self, node, links):
         l = []
         for i in links:
             if i[0] == node or i[1] == node: # we only want 0 and 1, since 2 is Weight.
                 l.append(i)
         return l
     
-    def specRemoveLink(self, link, links):
+    def scRemoveLink(self, link, links):
         if link in links:
             links.remove(link)
 
