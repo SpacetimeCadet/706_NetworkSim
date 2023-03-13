@@ -2,18 +2,20 @@ import pygame, sys
 import theme
 from button import Button
 from pygame.locals import QUIT
+import string
 
 pygame.init()
 
 #Screen setup
 #original size: Height = 1120, Width = 2025
 height = 800
-width = 1600
+width = 800
 size = [width, height]
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 pygame.display.set_caption('Connection Model')
 
 objects = []
+routers = []
 
 #style: 1 = teal theme, network background, 2 = blue theme, spiral background
 theme.style = 1
@@ -24,6 +26,22 @@ class Data():
     def __init__(self):
         self.state = True
         self.stateSetupDone = False
+        self.drawingRouter = False
+        self.drawingConnection = False
+
+class RouterIcon():
+  def __init__(self,x,y):
+    self.surface = screen
+    self.color = currentStyle.get("buttonColourDark")
+    self.center = (x,y)
+    self.radius = 20
+
+class ConnectionIcon():
+  def __init(self,x,y):
+    self.surface = screen
+    self.color = (0,0,0)
+    self.x = x
+    self.y = y
 
 
 def selectSendPort():
@@ -39,11 +57,10 @@ def selectRecievePort():
 
 
 def addRouter():
-    print('Add Router pressed')
-
+    data.drawingRouter = True
 
 def addConnection():
-    print('Add Connection pressed')
+    data.drawingConnection = True
 
 
 def toggleState():
@@ -54,22 +71,38 @@ def toggleState():
 
 def setupState():
     #get user input on routers, state=True
+    #Start by adding buttons
     if not data.stateSetupDone:
-        fontSize = width*0.013
+        fontSize = int(width*0.013)
         objects.extend([
             Button(width*0.04, height*0.18, width*0.12, height*0.05, fontSize, 'ADD ROUTER', addRouter),
             Button(width*0.19, height*0.18, width*0.13, height*0.05, fontSize, 'ADD CONNECTION', addConnection),
-            #probably remove "add connection" button, trigged by draging from one router to another
             Button(width*0.34, height*0.18, width*0.13, height*0.05, fontSize, 'RANDOMIZE DATA', addConnection),
             Button(width*0.4, height*0.8, width*0.2, height*0.05, fontSize, 'USE THIS DATA', toggleState)
             ])
         data.stateSetupDone = True
 
+    #drawing panel  
+    pygame.draw.rect(screen, (255,255,255), (width*0.04,height*0.25,width*0.92,height*0.5))
+  
+    #add new router
+    if pygame.mouse.get_pressed()[0] and data.drawingRouter:
+        mx, my = pygame.mouse.get_pos()
+        routers.append(RouterIcon(mx,my))
+        data.drawingRouter = False
+    
+    #draw all routers
+    i = 0
+    for router in routers:
+        pygame.draw.circle(router.surface, router.color, router.center, router.radius)
+        text(list(string.ascii_uppercase)[i], theme.lightFont, 15, currentStyle.get("titleColour"), router.center[0]-5, router.center[1]-5)
+        i = i+1
+
 
 def traceState():
     #main state, algoritms performed on router data, state=False
     if not data.stateSetupDone:
-        fontSize = width*0.013
+        fontSize = int(width*0.013)
         objects.extend([
             Button(width*0.04, height*0.18, width*0.12, height*0.05, fontSize, 'SENDING PORT', selectSendPort),
             Button(width*0.19, height*0.18, width*0.12, height*0.05, fontSize, 'ALGORITHM', selectAlgorithm),
@@ -83,10 +116,12 @@ def draw(size):
     screen.blit(currentStyle.get("background"), (0, 0))
     centreText("CPS706 PROJECT", theme.medFont, int(width*0.05), currentStyle.get("titleColour"), height*0.1)
     text("BY [GROUP MEMBERS]", theme.medFont, int(0.01*width), currentStyle.get("titleColour"), width*0.3, height*0.14)
+  
     if data.state:
         setupState()
     else:
         traceState()
+      
     for object in objects:
         object.process()
 
