@@ -18,7 +18,7 @@ class Button():
         self.buttonSurface = pygame.Surface((self.width, self.height))
         self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.currentStyle = theme.currentTheme()
-        self.buttonSurf = pygame.font.Font(theme.medFont, int(fontSize)).render(buttonText, True, self.currentStyle.get("buttonTextColour"))
+        self.buttonSurf = pygame.font.Font(theme.medFont, fontSize).render(buttonText, True, self.currentStyle.get("buttonTextColour"))
 
     def process(self):
         mousePos = pygame.mouse.get_pos()
