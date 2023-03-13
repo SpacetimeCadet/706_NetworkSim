@@ -1,3 +1,6 @@
+import os
+os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
+
 import pygame, sys
 import theme
 from button import Button
@@ -7,9 +10,8 @@ pygame.init()
 
 #Screen setup
 #original size: Height = 1120, Width = 2025
-height = 800
-width = 1600
-size = [width, height]
+height = 600
+width = 1200
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 pygame.display.set_caption('Connection Model')
 
@@ -79,8 +81,8 @@ def traceState():
         data.stateSetupDone = True
 
 
-def draw(size):
-    screen.blit(currentStyle.get("background"), (0, 0))
+def draw():
+    screen.blit(pygame.transform.smoothscale(currentStyle.get("background"), (width, height)), (0, 0))
     centreText("CPS706 PROJECT", theme.medFont, int(width*0.05), currentStyle.get("titleColour"), height*0.1)
     text("BY [GROUP MEMBERS]", theme.medFont, int(0.01*width), currentStyle.get("titleColour"), width*0.3, height*0.14)
     if data.state:
@@ -116,9 +118,20 @@ while True:
             sys.exit()
         if event.type == pygame.VIDEORESIZE:
             # There's some code to add back window content here.
-            screen = pygame.display.set_mode((event.w, event.h),
-                                              pygame.RESIZABLE)
-    draw(size)
+            if event.w < 600 or event.h < 300:
+                width = 600
+                height = 300
+            elif event.w != width:
+                width = event.w
+                height = width//2
+            else:
+                height = event.h
+                width = 2*height
+            screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+            data.stateSetupDone = False
+            objects.clear()
+            
+    draw()
     pygame.display.update()
     #fpsClock.tick(fps)
 

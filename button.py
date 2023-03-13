@@ -2,8 +2,8 @@ import pygame
 import theme
 pygame.init()
 
-height = 1120
-width = 2025
+height = 600
+width = 1200
 size = [width, height]
 screen = pygame.display.set_mode(size)
 
