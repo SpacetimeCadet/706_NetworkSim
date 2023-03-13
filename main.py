@@ -44,6 +44,7 @@ def addRouter():
     print('Add Router pressed')
 
 
+
 def addConnection():
     print('Add Connection pressed')
 
@@ -130,6 +131,7 @@ while True:
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
             data.stateSetupDone = False
             objects.clear()
+            
             
     draw()
     pygame.display.update()
