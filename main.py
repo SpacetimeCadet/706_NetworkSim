@@ -63,6 +63,10 @@ def addConnection():
     data.drawingConnection = True
 
 
+def onDrawingArea(x,y):
+  if x > width*0.04 and x < width*0.96 and y > height*0.25 and y < height *0.75:  
+    return True
+  return False
 def toggleState():
     data.state = (not data.state)
     data.stateSetupDone = False
@@ -88,14 +92,15 @@ def setupState():
     #add new router
     if pygame.mouse.get_pressed()[0] and data.drawingRouter:
         mx, my = pygame.mouse.get_pos()
-        routers.append(RouterIcon(mx,my))
-        data.drawingRouter = False
+        if onDrawingArea(mx,my):
+          routers.append(RouterIcon(mx,my))
+          data.drawingRouter = False
     
     #draw all routers
     i = 0
     for router in routers:
         pygame.draw.circle(router.surface, router.color, router.center, router.radius)
-        text(list(string.ascii_uppercase)[i], theme.lightFont, 15, currentStyle.get("titleColour"), router.center[0]-5, router.center[1]-5)
+        text(list(string.ascii_uppercase)[i%26], theme.lightFont, 15, currentStyle.get("titleColour"), router.center[0]-5, router.center[1]-5)
         i = i+1
 
 
