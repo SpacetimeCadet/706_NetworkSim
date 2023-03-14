@@ -1,4 +1,5 @@
 import os
+
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
 import pygame, sys
@@ -75,14 +76,18 @@ def addRouter():
     data.drawingConnection = False
 
 
-
 def addConnection():
     data.drawingConnection = True
     data.drawingRouter = False
 
 
+def clearData():
+    connections.clear()
+    routers.clear()
+
+
 def onDrawingArea(x, y):
-  #is the mouse over the drawing area?
+    #is the mouse over the drawing area?
     if x > width * 0.04 and x < width * 0.96 and y > height * 0.25 and y < height * 0.75:
         return True
     return False
@@ -127,6 +132,8 @@ def setupState():
                    fontSize, 'ADD CONNECTION', addConnection),
             Button(width * 0.34, height * 0.18, width * 0.13, height * 0.05,
                    fontSize, 'RANDOMIZE DATA', addConnection),
+            Button(width * 0.49, height * 0.18, width * 0.13, height * 0.05,
+                   fontSize, 'CLEAR NETWORK', clearData),
             Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
                    fontSize, 'USE THIS DATA', toggleState)
         ])
@@ -202,9 +209,10 @@ def traceState():
         data.stateSetupDone = True
 
 
-
 def draw():
-    screen.blit(pygame.transform.smoothscale(currentStyle.get("background"), (width, height)), (0, 0))
+    screen.blit(
+        pygame.transform.smoothscale(currentStyle.get("background"),
+                                     (width, height)), (0, 0))
     centreText("CPS706 PROJECT", theme.medFont, int(width * 0.05),
                currentStyle.get("titleColour"), height * 0.1)
     text("BY [GROUP MEMBERS]", theme.medFont, int(0.01 * width),
@@ -250,14 +258,14 @@ while True:
                 height = 300
             elif event.w != width:
                 width = event.w
-                height = width//2
+                height = width // 2
             else:
                 height = event.h
-                width = 2*height
+                width = 2 * height
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
             data.stateSetupDone = False
             objects.clear()
-                   
+
     draw()
     pygame.display.update()
     #fpsClock.tick(fps)
