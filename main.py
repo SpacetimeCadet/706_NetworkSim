@@ -157,9 +157,29 @@ def removeConnectionAtPoint(x,y):
           
     
 
-def dotProduct(a,b):
-  return (a[0]*b[0] + a[1]*b[1])
+def removeConnectionBetweenRouters(routerA, routerB):
+  #removes from "connections", doesn't change router connection lists
+  i = 0
+  for connection in connections:
+    if connection.start == routerA.center and connection.end == routerB.center:
+      connections.pop(i)
+      break
+    elif connection.start == routerB.center and connection.end == routerA.center:
+      connections.pop(i)
+      break
+    else:
+      i = i + 1
 
+def removeAllConnectionsOfRouter(routerA):
+  for neighbour in routerA.connections:
+    removeConnectionBetweenRouters(routerA, neighbour)
+    i = 0
+    for otherNeighbour in neighbour.connections:
+      if otherNeighbour == routerA:
+        neighbour.connections.pop(i)
+        break
+      i = i+1
+  routerA.connections.clear()
 def toggleState():
     data.state = (not data.state)
     data.stateSetupDone = False
@@ -220,6 +240,15 @@ def setupState():
     if pygame.mouse.get_pressed()[2]:
       mx, my = pygame.mouse.get_pos()
       removeConnectionAtPoint(mx,my)
+      if isClickingRouter():
+        r = getClickedRouter()
+        removeAllConnectionsOfRouter(r)
+        i = 0
+        for node in routers:
+          if node == r:
+            routers.pop(i)
+            break
+          i = i+1
 
     #draw all lines
     for connection in connections:
