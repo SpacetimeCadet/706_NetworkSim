@@ -103,13 +103,16 @@ def getClickedRouter():
                     1] + router.radius:
                 return router
 
-def getRouterAt(x,y):
+
+def getRouterAt(x, y):
     for router in routers:
         if x > router.center[0] - router.radius and x < router.center[
                 0] + router.radius:
             if y > router.center[1] - router.radius and y < router.center[
                     1] + router.radius:
                 return router
+
+
 def isClickingRouter():
     mx, my = pygame.mouse.get_pos()
     for router in routers:
@@ -122,68 +125,83 @@ def isClickingRouter():
 
 
 def disconnectRouters(routerA, routerB):
-  i=0
-  for neighbor in routerA.connections:
-    if neighbor == routerB:
-      routerA.connections.pop(i)
-    i = i+1
-  j=0
-  for neighbor in routerB.connections:
-    if neighbor == routerA:
-      routerB.connections.pop(j)
-    j = j+1 
-def removeConnectionAtPoint(x,y):
-  flexibility = 0.5
-  i = -1
-  for connection in connections:
-    #only check connections that are in the same "hit box" rectangle as the point
-    i = i+1
-    if (x < connection.start[0] and x > connection.end[0]) or (x > connection.start[0] and x < connection.end[0]):
-      if (y < connection.start[1] and y > connection.end[1]) or (y > connection.start[1] and y < connection.end[1]):
-        #refine for multiple connections in a "hit box"
-        newPointx = x-connection.start[0]
-        newPointy = y-connection.start[1]
-        newEndx = connection.end[0]-connection.start[0]
-        newEndy = connection.end[1]-connection.start[1]
-        endHyp = math.sqrt(newEndx*newEndx + newEndy*newEndy)
-        pointHyp = math.sqrt(newPointx*newPointx + newPointy*newPointy)
-        endAngle = newEndx/endHyp
-        pointAngle = newPointx/pointHyp
-        if pointAngle > endAngle - flexibility and pointAngle < endAngle + flexibility:
-          routerA = getRouterAt(connection.start[0],connection.start[1])
-          routerB = getRouterAt(connection.end[0],connection.end[1])
-          disconnectRouters(routerA, routerB)
-          connections.pop(i)
-          
-    
+    i = 0
+    for neighbor in routerA.connections:
+        if neighbor == routerB:
+            routerA.connections.pop(i)
+        i = i + 1
+    j = 0
+    for neighbor in routerB.connections:
+        if neighbor == routerA:
+            routerB.connections.pop(j)
+        j = j + 1
+
+
+def removeConnectionAtPoint(x, y):
+    flexibility = 0.5
+    i = -1
+    for connection in connections:
+        #only check connections that are in the same "hit box" rectangle as the point
+        i = i + 1
+        if (x < connection.start[0]
+                and x > connection.end[0]) or (x > connection.start[0]
+                                               and x < connection.end[0]):
+            if (y < connection.start[1]
+                    and y > connection.end[1]) or (y > connection.start[1]
+                                                   and y < connection.end[1]):
+                #refine for multiple connections in a "hit box"
+                newPointx = x - connection.start[0]
+                newPointy = y - connection.start[1]
+                newEndx = connection.end[0] - connection.start[0]
+                newEndy = connection.end[1] - connection.start[1]
+                endHyp = math.sqrt(newEndx * newEndx + newEndy * newEndy)
+                pointHyp = math.sqrt(newPointx * newPointx +
+                                     newPointy * newPointy)
+                endAngle = newEndx / endHyp
+                pointAngle = newPointx / pointHyp
+                if pointAngle > endAngle - flexibility and pointAngle < endAngle + flexibility:
+                    routerA = getRouterAt(connection.start[0],
+                                          connection.start[1])
+                    routerB = getRouterAt(connection.end[0], connection.end[1])
+                    disconnectRouters(routerA, routerB)
+                    connections.pop(i)
+
 
 def removeConnectionBetweenRouters(routerA, routerB):
-  #removes from "connections", doesn't change router connection lists
-  i = 0
-  for connection in connections:
-    if connection.start == routerA.center and connection.end == routerB.center:
-      connections.pop(i)
-      break
-    elif connection.start == routerB.center and connection.end == routerA.center:
-      connections.pop(i)
-      break
-    else:
-      i = i + 1
+    #removes from "connections", doesn't change router connection lists
+    i = 0
+    for connection in connections:
+        if connection.start == routerA.center and connection.end == routerB.center:
+            connections.pop(i)
+            break
+        elif connection.start == routerB.center and connection.end == routerA.center:
+            connections.pop(i)
+            break
+        else:
+            i = i + 1
+
 
 def removeAllConnectionsOfRouter(routerA):
-  for neighbour in routerA.connections:
-    removeConnectionBetweenRouters(routerA, neighbour)
-    i = 0
-    for otherNeighbour in neighbour.connections:
-      if otherNeighbour == routerA:
-        neighbour.connections.pop(i)
-        break
-      i = i+1
-  routerA.connections.clear()
+    for neighbour in routerA.connections:
+        removeConnectionBetweenRouters(routerA, neighbour)
+        i = 0
+        for otherNeighbour in neighbour.connections:
+            if otherNeighbour == routerA:
+                neighbour.connections.pop(i)
+                break
+            i = i + 1
+    routerA.connections.clear()
+
+
 def toggleState():
     data.state = (not data.state)
     data.stateSetupDone = False
     objects.clear()
+    data.drawingRouter = False
+    data.drawingConnection = False
+    data.routerSelected = False
+    data.routerA = 0
+    data.routerB = 0
 
 
 def setupState():
@@ -235,21 +253,30 @@ def setupState():
             else:
                 data.drawingConnection = False
                 data.routerSelected = False
-    
+
     #deletion
     if pygame.mouse.get_pressed()[2]:
-      mx, my = pygame.mouse.get_pos()
-      removeConnectionAtPoint(mx,my)
-      if isClickingRouter():
-        r = getClickedRouter()
-        removeAllConnectionsOfRouter(r)
-        i = 0
-        for node in routers:
-          if node == r:
-            routers.pop(i)
-            break
-          i = i+1
+        mx, my = pygame.mouse.get_pos()
+        removeConnectionAtPoint(mx, my)
+        if isClickingRouter():
+            r = getClickedRouter()
+            removeAllConnectionsOfRouter(r)
+            i = 0
+            for node in routers:
+                if node == r:
+                    routers.pop(i)
+                    break
+                i = i + 1
 
+    #Tell user if they're drawing router/connection
+    if data.drawingRouter:
+      text("Drawing Router", theme.medFont, int(0.015 * width),
+         currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
+    if data.drawingConnection:
+      text("Drawing Connection", theme.medFont, int(0.015 * width),
+         currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
+      
+    
     #draw all lines
     for connection in connections:
         pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
