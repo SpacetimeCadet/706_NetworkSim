@@ -24,7 +24,8 @@ pygame.display.set_caption('Connection Model')
 objects = []
 routers = []
 connections = []
-network = Network()
+from network import Network
+network = Network([], []) #empty lists create empty Network
 
 #style: 1 = teal theme, network background, 2 = blue theme, spiral background
 theme.style = 1
@@ -50,7 +51,8 @@ class RouterIcon():
         self.color = currentStyle.get("buttonColourDark")
         self.center = (x, y)
         self.radius = 20
-        #self.connections = []
+        #TODO: change to network links:
+        self.connections = []
 
 
 class ConnectionIcon():
