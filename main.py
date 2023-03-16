@@ -1,4 +1,5 @@
 import os
+from network import Network
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
@@ -23,6 +24,7 @@ pygame.display.set_caption('Connection Model')
 objects = []
 routers = []
 connections = []
+network = Network()
 
 #style: 1 = teal theme, network background, 2 = blue theme, spiral background
 theme.style = 1
@@ -48,7 +50,7 @@ class RouterIcon():
         self.color = currentStyle.get("buttonColourDark")
         self.center = (x, y)
         self.radius = 20
-        self.connections = []
+        #self.connections = []
 
 
 class ConnectionIcon():
@@ -81,6 +83,8 @@ def addConnection():
     data.drawingConnection = True
     data.drawingRouter = False
 
+def randomizeNetwork():
+    print('Randomize Network')
 
 def clearData():
     connections.clear()
@@ -136,7 +140,7 @@ def disconnectRouters(routerA, routerB):
             routerB.connections.pop(j)
         j = j + 1
 
-
+#removeLink()
 def removeConnectionAtPoint(x, y):
     flexibility = 0.5
     i = -1
@@ -180,7 +184,7 @@ def removeConnectionBetweenRouters(routerA, routerB):
         else:
             i = i + 1
 
-
+#removeAllConnection()
 def removeAllConnectionsOfRouter(routerA):
     for neighbour in routerA.connections:
         removeConnectionBetweenRouters(routerA, neighbour)
@@ -215,7 +219,7 @@ def setupState():
             Button(width * 0.19, height * 0.18, width * 0.13, height * 0.05,
                    fontSize, 'ADD CONNECTION', addConnection),
             Button(width * 0.34, height * 0.18, width * 0.13, height * 0.05,
-                   fontSize, 'RANDOMIZE DATA', addConnection),
+                   fontSize, 'RANDOMIZE DATA', randomizeNetwork),
             Button(width * 0.49, height * 0.18, width * 0.13, height * 0.05,
                    fontSize, 'CLEAR NETWORK', clearData),
             Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
@@ -232,6 +236,7 @@ def setupState():
         if data.drawingRouter:
             mx, my = pygame.mouse.get_pos()
             if onDrawingArea(mx, my):
+                ### ADD ROUTER ###
                 routers.append(RouterIcon(mx, my))
                 data.drawingRouter = False
         #add new connection
@@ -246,6 +251,8 @@ def setupState():
                                    data.routerA.center[1],
                                    data.routerB.center[0],
                                    data.routerB.center[1]))
+                
+                ### ADD CONNECTIONS ### 
                 data.routerA.connections.append(data.routerB)
                 data.routerB.connections.append(data.routerA)
                 data.drawingConnection = False
@@ -257,6 +264,7 @@ def setupState():
     #deletion
     if pygame.mouse.get_pressed()[2]:
         mx, my = pygame.mouse.get_pos()
+        ### REMOVE CONNECTION ###
         removeConnectionAtPoint(mx, my)
         if isClickingRouter():
             r = getClickedRouter()
@@ -264,6 +272,7 @@ def setupState():
             i = 0
             for node in routers:
                 if node == r:
+                    ### REMOVE ROUTER ###
                     routers.pop(i)
                     break
                 i = i + 1

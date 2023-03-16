@@ -8,14 +8,21 @@ n = Network([1, 2, 3, 4], [[1, 2, 5], [2, 3, 10], [2, 4, 15], [3, 4, 5]])
 
 print("- - - - -")
 print("Initial State")
-print(n.nodes)
-print(n.links)
+print("Routers:", n.nodes)
+print("Connections:", n.links)
 print("- - - - -")
 
 print("- - - - -")
 print("toDictionary")
 temp = n.toDictionary()
 print (temp)
+print("- - - - -")
+
+print("- - - - -")
+print("updateWeight")
+temp = n.modifyLinkWeight([2,3,10], 7)
+print("Routers:", n.nodes)
+print("Connections:", n.links)
 print("- - - - -")
 
 print("Links Containing Node #2")
@@ -36,6 +43,12 @@ print("- - - - -")
 
 print("Remove Node #2")
 n.removeNode(2) # removing a node will also remove any links containing it.
+print(n.nodes)
+print(n.links)
+print("- - - - -")
+
+print("Randomize Network N=10")
+n.randomizeNetwork(3)
 print(n.nodes)
 print(n.links)
 print("- - - - -")

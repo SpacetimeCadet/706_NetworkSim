@@ -1,20 +1,34 @@
 import copy
+import random
+import string
 
 class Network():
     def __init__(self, nodes, links):
         self.nodes = nodes # A list of numeric identifiers for the nodes of the network.
         self.links = links # A list of triples in the form [nodeSource, nodeDestination, Weight].
 
-    # THIS METHOD IS NOT YET COMPLETE
-    def generateNetwork(self, size):
+    #assignRouterName() <-- for adding new routers
+    
+    # this method clears the current network and randomly generates a network of the specified size (must be between 2-20 nodes)
+    def randomizeNetwork(self, size):
+            # Verify Arguments and Initialize Network
             self.nodes = []
-            self.nodes = [n for n in range(size)]
             self.links = []
+            if size > 20:
+                i = 20
+            elif size < 2:
+                i = 2
+            else:
+                i = size
 
-            #for i in range(size):
-                # randomly assign links between nodes
-                # nested loop or linear approach?
+            # Generate Network
+            self.nodes = [n for n in range(i)]
 
+            for i in self.nodes:
+                for j in self.nodes:
+                    if i != j and self.flipCoin():
+                        x = random.randint(0, 50)
+                        self.links.append([i, j, x])
 
     # this method returns the network formatted into a dictionary
     def toDictionary(self):
@@ -66,7 +80,13 @@ class Network():
         if link in self.links:
             self.links.remove(link)
 
-    
+    def modifyLinkWeight(self, link, weight):
+        if link in self.links:
+            a = link[0]
+            b = link[1]
+            i = self.links.index(link)
+            self.links[i] = [a, b, weight]
+
     # BELOW ARE HELPER FUNCTIONS FOR THE NETWORK CLASS #
     def scGetLinksOf(self, node, links):
         l = []
@@ -78,6 +98,10 @@ class Network():
     def scRemoveLink(self, link, links):
         if link in links:
             links.remove(link)
+
+    # this method returns a random True or False value
+    def flipCoin(self):
+        return random.choice([True,False])
 
         
     
