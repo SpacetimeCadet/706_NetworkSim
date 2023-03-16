@@ -27,7 +27,7 @@ network = Network([], []) #empty lists create empty Network
 theme.style = 1
 currentStyle = theme.currentTheme()
 
-
+### DATA STRUCTURES ###
 class Data():
     #keep track of central variables
     def __init__(self):
@@ -339,7 +339,7 @@ def setupState():
       text("DRAWING CONNECTION - click the source then the destination", theme.medFont, int(0.015 * width),
          currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     else:
-      text("hint: right-click to remove a router", theme.medFont, int(0.015 * width),
+      text("hint: right-click to remove a router/connection", theme.medFont, int(0.015 * width),
       currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
       
     
