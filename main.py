@@ -125,7 +125,6 @@ def onDrawingArea(x, y):
     return False
 
 
-#TODO: integrate with Network class
 def getClickedRouter():
     mx, my = pygame.mouse.get_pos()
     for router in routers:
@@ -236,6 +235,7 @@ def removeAllConnectionsOfRouter(routerA):
                 break
             i = i + 1
     routerA.connections.clear()
+
 
 ### STATES ###
 def toggleState():
