@@ -56,7 +56,10 @@ class ConnectionIcon():
         self.surface = screen
         self.color = (0, 0, 0)
         self.start = (x1, y1)
+        self.startRouter = getRouterAt(self.start)
         self.end = (x2, y2)
+        self.endRouter = getRouterAt(self.end)
+        self.weight = 1
 
 
 def selectSendPort():
