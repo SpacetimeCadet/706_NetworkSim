@@ -293,6 +293,7 @@ def setupState():
     for connection in connections:
         pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
                          2)
+        text(str(connection.weight), theme.lightFont, 15, currentStyle.get("buttonColourLight"), (connection.start[0]+connection.end[0])/2, (connection.start[1]+connection.end[1])/2)
 
     #draw all routers
     i = 0
