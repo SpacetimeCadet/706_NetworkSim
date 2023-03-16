@@ -6,8 +6,7 @@ class Network():
         self.nodes = nodes # A list of numeric identifiers for the nodes of the network.
         self.links = links # A list of triples in the form [nodeSource, nodeDestination, Weight].
 
-    #assignRouterName() <-- for adding new routers
-    
+
     # this method clears the current network and randomly generates a network of the specified size (must be between 2-20 nodes)
     def randomizeNetwork(self, size):
             # Verify Arguments and Initialize Network
@@ -103,6 +102,20 @@ class Network():
     def flipCoin(self):
         return random.choice([True,False])
 
-        
+    def assignNode(self):
+        x = 1
+        assign = len(self.nodes) 
+        for i in self.nodes:
+            if i != x:
+                assign = x
+                return assign
+            x = x + 1
+            assign = x
+
+        if assign < 1:
+            assign = 1
+        return assign
     
-    
+    def clear(self):
+        self.nodes = []
+        self.links = []
