@@ -209,6 +209,7 @@ def removeConnectionAtPoint(x, y):
                     routerB = getRouterAt(connection.end[0], connection.end[1])
                     disconnectRouters(routerA, routerB)
                     connections.pop(i)
+                    network.removeLink([routerA.id, routerB.id, network.getWeight(routerA.id, routerB.id)])
 
 
 def removeConnectionBetweenRouters(routerA, routerB):
