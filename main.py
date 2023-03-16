@@ -418,7 +418,7 @@ def centreText(words, font, size, colour, y):
     screen.blit(textA, text_rect)
 
 
-#Game loop
+### GAME LOOP ###
 data = Data()
 while True:
     event = pygame.event.wait()
