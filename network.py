@@ -1,5 +1,4 @@
-import copy
-import random
+import copy, random
 
 class Network():
     def __init__(self, nodes, links):
@@ -9,9 +8,8 @@ class Network():
 
     # this method clears the current network and randomly generates a network of the specified size (must be between 2-20 nodes)
     def randomizeNetwork(self, size):
-            # Verify Arguments and Initialize Network
-            self.nodes = []
-            self.links = []
+            # Initialize Network and Verify Arguments
+            self.clear()
             if size > 20:
                 i = 20
             elif size < 2:
@@ -22,11 +20,13 @@ class Network():
             # Generate Network
             self.nodes = [n for n in range(i)]
 
+            # Generate Links
             for i in self.nodes:
                 for j in self.nodes:
                     if i != j and self.flipCoin():
                         x = random.randint(0, 50)
                         self.links.append([i, j, x])
+
 
     # this method returns the network formatted into a dictionary
     def toDictionary(self):
@@ -41,9 +41,23 @@ class Network():
             dict[i] = connections
         return dict
     
-    def getWeight(self, a, b):
-        link = self.getLinkWith(a, b)
+
+    # this method returns the weight of the link between the specified nodes.
+    def getWeight(self, nodeA, nodeB):
+        link = self.getLinkWith(nodeA, nodeB)
         return link[0][2]
+    
+
+    # this method will update the weight of a link as long as it is found in the list.
+    def setWeight(self, nodeA, nodeB, weight):
+        link = self.getLinkWith(nodeA, nodeB)
+        link = link[0]
+        if link in self.links:
+            src = link[0]
+            dst = link[1]
+            i = self.links.index(link)
+            self.links[i] = [src, dst, weight]
+
 
     # this method returns a list of links containing the specified node.
     def getLinksOf(self, node):
@@ -53,19 +67,23 @@ class Network():
                 l.append(i)
         return l
     
+
+    # this method returns a link (as a list) containing the specified nodes
     def getLinkWith(self, nodeA, nodeB):
         l = []
         for i in self.links:
             if i[0] == nodeA and i[1] == nodeB:
                 l.append(i)
         return l
-        
+
+
     # this method will create a node as long as it is not already in the list.
     # the list is resorted in ascending order.
     def addNode(self, node):
         if not (node in self.nodes):
             self.nodes.append(node)
             self.nodes.sort()
+
 
     # this method will delete a node as long as it is found in the list.
     # it will also remove any links containing the node using:
@@ -77,11 +95,13 @@ class Network():
            for i in removed:
                self.removeLink(i)
         
+
     # this method will create a link as long as it is not already in the list
     # todo: check permutations
     def addLink(self, link):
         if not (link in self.links):
             self.links.append(link)
+
 
     # this method will delete a link as long as it is found in the list.
     # todo: check permutations
@@ -89,15 +109,8 @@ class Network():
         if link in self.links:
             self.links.remove(link)
 
-    # this method will update the weight of a link as long as it is found in the list.
-    def modifyLinkWeight(self, link, weight):
-        if link in self.links:
-            a = link[0]
-            b = link[1]
-            i = self.links.index(link)
-            self.links[i] = [a, b, weight]
 
-    # BELOW ARE HELPER FUNCTIONS FOR THE NETWORK CLASS #
+    ### HELPER FUNCTIONS ###
     def scGetLinksOf(self, node, links):
         l = []
         for i in links:
@@ -105,13 +118,16 @@ class Network():
                 l.append(i)
         return l
     
+
     def scRemoveLink(self, link, links):
         if link in links:
             links.remove(link)
 
+
     # this method returns a random True or False value
     def flipCoin(self):
         return random.choice([True,False])
+
 
     def assignNode(self):
         x = 1
