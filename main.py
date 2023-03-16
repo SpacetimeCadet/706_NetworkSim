@@ -56,9 +56,9 @@ class ConnectionIcon():
         self.surface = screen
         self.color = (0, 0, 0)
         self.start = (x1, y1)
-        self.startRouter = getRouterAt(self.start)
+        self.startRouter = getRouterAt(x1,y1)
         self.end = (x2, y2)
-        self.endRouter = getRouterAt(self.end)
+        self.endRouter = getRouterAt(x2,y2)
         self.weight = 1
 
 
