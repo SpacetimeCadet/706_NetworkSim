@@ -110,6 +110,7 @@ def onDrawingArea(x, y):
         return True
     return False
 
+
 #TODO: integrate with Network class
 def getClickedRouter():
     mx, my = pygame.mouse.get_pos()
@@ -138,6 +139,8 @@ def routerExists(x,y):
                     1] + router.radius:
                 return True
     return False
+
+
 def isClickingRouter():
     mx, my = pygame.mouse.get_pos()
     for router in routers:
@@ -160,6 +163,7 @@ def disconnectRouters(routerA, routerB):
         if neighbor == routerA:
             routerB.connections.pop(j)
         j = j + 1
+
 
 #removeLink()
 def removeConnectionAtPoint(x, y):
@@ -204,6 +208,7 @@ def removeConnectionBetweenRouters(routerA, routerB):
             break
         else:
             i = i + 1
+
 
 #removeAllConnection()
 def removeAllConnectionsOfRouter(routerA):
@@ -259,6 +264,7 @@ def setupState():
             if onDrawingArea(mx, my):
                 ### ADD ROUTER ###
                 routers.append(RouterIcon(mx, my, network.assignNode()))
+                network.addNode(network.assignNode())
                 data.drawingRouter = False
         #add new connection
         if data.drawingConnection:
@@ -277,6 +283,7 @@ def setupState():
                 #TODO: add prompt to ask for connection weight
                 data.routerA.connections.append(data.routerB)
                 data.routerB.connections.append(data.routerA)
+               ###############
                 data.drawingConnection = False
                 data.routerSelected = False
             else:
