@@ -5,6 +5,7 @@ import pygame, sys, string, math, theme
 from button import Button
 from pygame.locals import QUIT
 from network import Network
+import random
 
 pygame.init()
 
@@ -84,9 +85,17 @@ def addConnection():
     data.drawingRouter = False
 
 def randomizeNetwork():
+    clearData()
     #TODO: add a prompt to ask for number of routers to generate
     #network.randomizeNetwork(x)
     network.randomizeNetwork(10)
+    for node in network.nodes:
+      randx = random.randint(width * 0.1, width * 0.9)
+      randy = random.randint(height * 0.30, height * 0.70)
+      while routerExists(randx,randy):
+        randx = random.randint(width * 0.1, width * 0.9)
+        randy = random.randint(height * 0.30, height * 0.70)
+      routers.append(RouterIcon(randx,randy))
 
 def clearData():
     connections.clear()
@@ -119,6 +128,14 @@ def getRouterAt(x, y):
                 return router
 
 
+def routerExists(x,y):
+    for router in routers:
+        if x > router.center[0] - router.radius and x < router.center[
+                0] + router.radius:
+            if y > router.center[1] - router.radius and y < router.center[
+                    1] + router.radius:
+                return True
+    return False
 def isClickingRouter():
     mx, my = pygame.mouse.get_pos()
     for router in routers:
