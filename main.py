@@ -42,13 +42,12 @@ class Data():
 
 class RouterIcon():
     #depicts router on drawing screen, tracks connections
-    def __init__(self, x, y, id):
+    def __init__(self, x, y):
         self.surface = screen
         self.color = currentStyle.get("buttonColourDark")
         self.center = (x, y)
         self.radius = 20
         #TODO: change to network links:
-        self.id = id
         self.connections = []
 
 
@@ -99,7 +98,6 @@ def randomizeNetwork():
       routers.append(RouterIcon(randx,randy))
 
 def clearData():
-    network.clear()
     connections.clear()
     routers.clear()
 
@@ -258,8 +256,7 @@ def setupState():
             mx, my = pygame.mouse.get_pos()
             if onDrawingArea(mx, my):
                 ### ADD ROUTER ###
-                routers.append(RouterIcon(mx, my, network.assignNode()))
-                network.addNode(network.assignNode())
+                routers.append(RouterIcon(mx, my))
                 data.drawingRouter = False
         #add new connection
         if data.drawingConnection:
