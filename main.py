@@ -1,14 +1,10 @@
 import os
-from network import Network
-
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
-import pygame, sys
-import theme
+import pygame, sys, string, math, theme
 from button import Button
 from pygame.locals import QUIT
-import string
-import math
+from network import Network
 
 pygame.init()
 
@@ -24,7 +20,6 @@ pygame.display.set_caption('Connection Model')
 objects = []
 routers = []
 connections = []
-from network import Network
 network = Network([], []) #empty lists create empty Network
 
 #style: 1 = teal theme, network background, 2 = blue theme, spiral background
@@ -86,7 +81,9 @@ def addConnection():
     data.drawingRouter = False
 
 def randomizeNetwork():
-    print('Randomize Network')
+    #TODO: add a prompt to ask for number of routers to generate
+    #network.randomizeNetwork(x)
+    network.randomizeNetwork(10)
 
 def clearData():
     connections.clear()
@@ -99,7 +96,7 @@ def onDrawingArea(x, y):
         return True
     return False
 
-
+#TODO: integrate with Network class
 def getClickedRouter():
     mx, my = pygame.mouse.get_pos()
     for router in routers:
@@ -255,6 +252,7 @@ def setupState():
                                    data.routerB.center[1]))
                 
                 ### ADD CONNECTIONS ### 
+                #TODO: add prompt to ask for connection weight
                 data.routerA.connections.append(data.routerB)
                 data.routerB.connections.append(data.routerA)
                 data.drawingConnection = False

@@ -4,6 +4,14 @@ from network import Network
 
 # ex. instantiate manually
 # n = Network([nodes], [links]); where links are [source, destination, weight]
+n= Network([], [])
+print("Randomize Network N=10")
+n.randomizeNetwork(3)
+print(n.nodes)
+print(n.links)
+print("- - - - -")
+
+"""
 n = Network([1, 2, 3, 4], [[1, 2, 5], [2, 3, 10], [2, 4, 15], [3, 4, 5]])
 
 print("- - - - -")
@@ -52,3 +60,4 @@ n.randomizeNetwork(3)
 print(n.nodes)
 print(n.links)
 print("- - - - -")
+"""

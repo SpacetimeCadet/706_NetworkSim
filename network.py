@@ -1,6 +1,5 @@
 import copy
 import random
-import string
 
 class Network():
     def __init__(self, nodes, links):
@@ -80,6 +79,7 @@ class Network():
         if link in self.links:
             self.links.remove(link)
 
+    # this method will update the weight of a link as long as it is found in the list.
     def modifyLinkWeight(self, link, weight):
         if link in self.links:
             a = link[0]
