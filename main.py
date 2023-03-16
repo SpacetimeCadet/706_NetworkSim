@@ -283,7 +283,11 @@ def setupState():
                 #TODO: add prompt to ask for connection weight
                 data.routerA.connections.append(data.routerB)
                 data.routerB.connections.append(data.routerA)
-               ###############
+                weight = 1 #TODO: make weight dynamic
+                if data.routerA.id < data.routerB.id:
+                    network.addLink([data.routerA.id, data.routerB.id, weight])
+                else:
+                    network.addLink([data.routerB.id, data.routerA.id, weight])
                 data.drawingConnection = False
                 data.routerSelected = False
             else:
