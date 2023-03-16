@@ -1,7 +1,7 @@
 import os
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
-import pygame, sys, string, math, theme
+import pygame, sys, string, math, theme, datetime, random
 from button import Button
 from pygame.locals import QUIT
 from network import Network
@@ -47,7 +47,6 @@ class RouterIcon():
         self.color = currentStyle.get("buttonColourDark")
         self.center = (x, y)
         self.radius = 20
-        #TODO: change to network links:
         self.id = id
         self.connections = []
 
@@ -62,8 +61,14 @@ class ConnectionIcon():
         self.end = (x2, y2)
         self.endRouter = getRouterAt(x2,y2)
         self.weight = 1
+        self.a = 0
+        self.b = 0
+    
+    def addIDs(self, a, b):
+        self.a = a
+        self.b = b
 
-
+### INTERFACE FUNCTIONALITY ###
 def selectSendPort():
     print('Send pressed')
 
@@ -82,14 +87,14 @@ def addRouter():
 
 
 def addConnection():
-    data.drawingConnection = True
-    data.drawingRouter = False
+    if len(network.nodes) > 1:
+        data.drawingConnection = True
+        data.drawingRouter = False
+
 
 def randomizeNetwork():
     clearData()
-    #TODO: add a prompt to ask for number of routers to generate
-    #network.randomizeNetwork(x)
-    network.randomizeNetwork(10)
+    network.randomizeNetwork(random.randint(2,12))
     for node in network.nodes:
       randx = random.randint(width * 0.1, width * 0.9)
       randy = random.randint(height * 0.30, height * 0.70)
@@ -98,12 +103,21 @@ def randomizeNetwork():
         randy = random.randint(height * 0.30, height * 0.70)
       routers.append(RouterIcon(randx,randy, node))
 
+
 def clearData():
     network.clear()
     connections.clear()
     routers.clear()
 
 
+def printDebug():
+    print("- - -")
+    print(datetime.datetime.now())
+    print("nodes:", network.nodes)
+    print("links:", network.links)
+    print("dictionary:", network.toDictionary())
+
+### UI HELPER METHODS ###
 def onDrawingArea(x, y):
     #is the mouse over the drawing area?
     if x > width * 0.04 and x < width * 0.96 and y > height * 0.25 and y < height * 0.75:
@@ -163,9 +177,10 @@ def disconnectRouters(routerA, routerB):
         if neighbor == routerA:
             routerB.connections.pop(j)
         j = j + 1
+    #remove specified link
+    network.removeLink([routerA.id, routerB.id, network.getLinkWith(routerA.id, routerB.id)])
 
 
-#removeLink()
 def removeConnectionAtPoint(x, y):
     flexibility = 0.5
     i = -1
@@ -210,7 +225,6 @@ def removeConnectionBetweenRouters(routerA, routerB):
             i = i + 1
 
 
-#removeAllConnection()
 def removeAllConnectionsOfRouter(routerA):
     for neighbour in routerA.connections:
         removeConnectionBetweenRouters(routerA, neighbour)
@@ -222,7 +236,7 @@ def removeAllConnectionsOfRouter(routerA):
             i = i + 1
     routerA.connections.clear()
 
-
+### STATES ###
 def toggleState():
     data.state = (not data.state)
     data.stateSetupDone = False
@@ -248,8 +262,11 @@ def setupState():
                    fontSize, 'RANDOMIZE DATA', randomizeNetwork),
             Button(width * 0.49, height * 0.18, width * 0.13, height * 0.05,
                    fontSize, 'CLEAR NETWORK', clearData),
+            Button(width * 0.64, height * 0.18, width * 0.13, height * 0.05,
+                   fontSize, 'PRINT DEBUG', printDebug),
             Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
                    fontSize, 'USE THIS DATA', toggleState)
+            
         ])
         data.stateSetupDone = True
 
@@ -273,11 +290,14 @@ def setupState():
                 data.routerSelected = True
             elif data.routerSelected and isClickingRouter():
                 data.routerB = getClickedRouter()
-                connections.append(
-                    ConnectionIcon(data.routerA.center[0],
+                conIcon = ConnectionIcon(data.routerA.center[0],
                                    data.routerA.center[1],
                                    data.routerB.center[0],
-                                   data.routerB.center[1]))
+                                   data.routerB.center[1])
+                connections.append(conIcon)
+                conIcon.addIDs(data.routerA.id, data.routerB.id)
+
+                
                 
                 ### ADD CONNECTIONS ### 
                 #TODO: add prompt to ask for connection weight
@@ -306,23 +326,29 @@ def setupState():
             for node in routers:
                 if node == r:
                     ### REMOVE ROUTER ###
+                    network.removeNode(r.id)
                     routers.pop(i)
                     break
                 i = i + 1
 
-    #Tell user if they're drawing router/connection
+    #Tell user if they're drawing router/connection, otherwise display default text
     if data.drawingRouter:
-      text("Drawing Router", theme.medFont, int(0.015 * width),
+      text("DRAWING ROUTER - click anywhere", theme.medFont, int(0.015 * width),
          currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
-    if data.drawingConnection:
-      text("Drawing Connection", theme.medFont, int(0.015 * width),
+    elif data.drawingConnection:
+      text("DRAWING CONNECTION - click the source then the destination", theme.medFont, int(0.015 * width),
          currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
+    else:
+      text("hint: right-click to remove a router", theme.medFont, int(0.015 * width),
+      currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
       
     
     #draw all lines
     for connection in connections:
         pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
                          2)
+        ### TODO: use Network function: 
+        #                   getWeight(connection.a, connection.b)
         text(str(connection.weight), theme.lightFont, 15, currentStyle.get("buttonColourLight"), (connection.start[0]+connection.end[0])/2, (connection.start[1]+connection.end[1])/2)
 
     #draw all routers
@@ -331,7 +357,7 @@ def setupState():
         pygame.draw.circle(router.surface, router.color, router.center,
                            router.radius)
         text(
-            list(string.ascii_uppercase)[i % 26], theme.lightFont, 15,
+            str(router.id), theme.lightFont, 15,
             currentStyle.get("titleColour"), router.center[0] - 5,
             router.center[1] - 5)
         i = i + 1

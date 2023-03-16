@@ -40,12 +40,23 @@ class Network():
                 self.scRemoveLink(j, links)
             dict[i] = connections
         return dict
+    
+    def getWeight(self, a, b):
+        link = self.getLinkWith(a, b)
+        return link[0][2]
 
     # this method returns a list of links containing the specified node.
     def getLinksOf(self, node):
         l = []
         for i in self.links:
             if i[0] == node or i[1] == node: # we only want 0 and 1, since 2 is Weight.
+                l.append(i)
+        return l
+    
+    def getLinkWith(self, nodeA, nodeB):
+        l = []
+        for i in self.links:
+            if i[0] == nodeA and i[1] == nodeB:
                 l.append(i)
         return l
         
