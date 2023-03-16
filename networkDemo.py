@@ -61,7 +61,7 @@ print("- - - - -")
 
 
 print("Randomize Network N=10")
-n.randomizeNetwork(3)
+n.randomizeNetwork(10)
 print(n.nodes)
 print(n.links)
 print("- - - - -")
