@@ -301,7 +301,6 @@ def setupState():
                 
                 
                 ### ADD CONNECTIONS ### 
-                #TODO: add prompt to ask for connection weight
                 data.routerA.connections.append(data.routerB)
                 data.routerB.connections.append(data.routerA)
                 weight = 1 #TODO: make weight dynamic
