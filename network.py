@@ -25,8 +25,7 @@ class Network():
                 for j in self.nodes:
                     if i != j and self.flipCoin():
                         x = random.randint(0, 50)
-                        self.links.append([i, j, x])
-
+                        self.addLink([i, j, x])
 
     # this method returns the network formatted into a dictionary
     def toDictionary(self):
@@ -74,6 +73,8 @@ class Network():
         for i in self.links:
             if i[0] == nodeA and i[1] == nodeB:
                 l.append(i)
+        if l == []:
+            l = [0, 0, 0]
         return l
 
 
