@@ -161,7 +161,7 @@ class Network():
 
 
     def flipCoin(self):
-        x = random.randint(1, 10)
+        x = random.randint(1, 9)
         if x == 1:
             return True
         return False
