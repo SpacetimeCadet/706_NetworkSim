@@ -102,6 +102,12 @@ def randomizeNetwork():
         randx = random.randint(width * 0.1, width * 0.9)
         randy = random.randint(height * 0.30, height * 0.70)
       routers.append(RouterIcon(randx,randy, node))
+    for link in network.links:
+      startID = link[0]
+      endID = link[1]
+      weight = link[2]
+      connections.append(ConnectionIcon(routers[startID].center[0], routers[startID].center[1], routers[endID].center[0], routers[endID].center[1]))
+      connections[-1].weight = weight
 
 
 def clearData():
