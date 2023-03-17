@@ -189,14 +189,10 @@ def disconnectRouters(routerA, routerB):
         if neighbor == routerA:
             routerB.connections.pop(j)
         j = j + 1
-    #remove specified link
-    network.removeLink(
-        [routerA.id, routerB.id,
-         network.getLinkWith(routerA.id, routerB.id)])
 
 
 def removeConnectionAtPoint(x, y):
-    flexibility = 0.5
+    flexibility = 0.01
     i = -1
     for connection in connections:
         #only check connections that are in the same "hit box" rectangle as the point
