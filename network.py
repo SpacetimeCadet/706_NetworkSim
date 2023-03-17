@@ -17,7 +17,7 @@ class Network():
             else:
                 i = size
 
-            # Generate Network
+            # Generate Nodes
             self.nodes = [n for n in range(i)]
 
             # Generate Links
@@ -97,9 +97,18 @@ class Network():
         
 
     # this method will create a link as long as it is not already in the list
-    # todo: check permutations
     def addLink(self, link):
+        #TODO: permutations (different order, same weights) 
+        #          and duplicates (either order, different weights)
+        
         if not (link in self.links):
+            if link[0] < link[1]:
+                x = link[0]
+                y = link[1]
+                w = link[2]
+                link = [y, x, w]
+                print(x,y,w)
+                print(link)
             self.links.append(link)
 
 
@@ -126,7 +135,10 @@ class Network():
 
     # this method returns a random True or False value
     def flipCoin(self):
-        return random.choice([True,False])
+        x = random.randint(1, 10)
+        if x == 1:
+            return True
+        return False
 
 
     def assignNode(self):

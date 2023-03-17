@@ -11,7 +11,16 @@ print("Routers:", n.nodes)
 print("Connections:", n.links)
 print("- - - - -")
 
+print("- - - - -")
+print("Add Duplicate Link")
+n.addLink([2, 1, 5])
+n.addLink([1, 2, 10])
+n.addLink([2, 1, 10])
+print("Routers:", n.nodes)
+print("Connections:", n.links)
+print("- - - - -")
 
+"""
 print("- - - - -")
 print("toDictionary")
 temp = n.toDictionary()
@@ -65,3 +74,4 @@ n.randomizeNetwork(10)
 print(n.nodes)
 print(n.links)
 print("- - - - -")
+"""
