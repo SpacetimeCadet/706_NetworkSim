@@ -25,8 +25,7 @@ class Network():
                 for j in self.nodes:
                     if i != j and self.flipCoin():
                         x = random.randint(0, 50)
-                        self.links.append([i, j, x])
-
+                        self.addLink([i, j, x])
 
     # this method returns the network formatted into a dictionary
     def toDictionary(self):
@@ -74,6 +73,8 @@ class Network():
         for i in self.links:
             if i[0] == nodeA and i[1] == nodeB:
                 l.append(i)
+        if l == []:
+            l = [0, 0, 0]
         return l
 
 
@@ -102,14 +103,18 @@ class Network():
         #          and duplicates (either order, different weights)
         
         if not (link in self.links):
-            if link[0] < link[1]:
+            x = link[0]
+            y = link[1]
+            w = link[2]
+
+            if x > y:
+                link = [y, x, w]
                 x = link[0]
                 y = link[1]
-                w = link[2]
-                link = [y, x, w]
-                print(x,y,w)
-                print(link)
-            self.links.append(link)
+            
+            compare = self.getLinkWith(x, y)
+            if compare[0] == 0 and compare[1] == 0:
+                self.links.append(link)
 
 
     # this method will delete a link as long as it is found in the list.
@@ -147,7 +152,7 @@ class Network():
             assign = 1
         return assign
     
-    
+
     def clear(self):
         self.nodes = []
         self.links = []
