@@ -99,7 +99,7 @@ def randomizeNetwork():
     for node in network.nodes:
         randx = random.randint(width * 0.1, width * 0.9)
         randy = random.randint(height * 0.30, height * 0.70)
-        while routerExists(randx, randy):
+        while getRouterAt(randx, randy) != False:
             randx = random.randint(width * 0.1, width * 0.9)
             randy = random.randint(height * 0.30, height * 0.70)
         routers.append(RouterIcon(randx, randy, node))
@@ -140,13 +140,7 @@ def onDrawingArea(x, y):
 
 def getClickedRouter():
     mx, my = pygame.mouse.get_pos()
-    for router in routers:
-        if mx > router.center[0] - router.radius and mx < router.center[
-                0] + router.radius:
-            if my > router.center[1] - router.radius and my < router.center[
-                    1] + router.radius:
-                return router
-
+    return getRouterAt(mx, my)
 
 def getRouterAt(x, y):
     for router in routers:
@@ -155,28 +149,11 @@ def getRouterAt(x, y):
             if y > router.center[1] - router.radius and y < router.center[
                     1] + router.radius:
                 return router
-
-
-def routerExists(x, y):
-    for router in routers:
-        if x > router.center[0] - router.radius and x < router.center[
-                0] + router.radius:
-            if y > router.center[1] - router.radius and y < router.center[
-                    1] + router.radius:
-                return True
     return False
 
 
 def isClickingRouter():
-    mx, my = pygame.mouse.get_pos()
-    for router in routers:
-        if mx > router.center[0] - router.radius and mx < router.center[
-                0] + router.radius:
-            if my > router.center[1] - router.radius and my < router.center[
-                    1] + router.radius:
-                return True
-    return False
-
+    return getClickedRouter != False
 
 def disconnectRouters(routerA, routerB):
     i = 0
@@ -299,28 +276,30 @@ def setupState():
                 data.drawingRouter = False
         #add new connection
         if data.drawingConnection:
-            if not data.routerSelected and isClickingRouter():
+            if not data.routerSelected:
                 data.routerA = getClickedRouter()
-                data.routerSelected = True
-            elif data.routerSelected and isClickingRouter():
+                if (data.routerA != False):
+                    data.routerSelected = True
+            elif data.routerSelected:
                 data.routerB = getClickedRouter()
-                conIcon = ConnectionIcon(data.routerA.center[0],
-                                         data.routerA.center[1],
-                                         data.routerB.center[0],
-                                         data.routerB.center[1])
-                connections.append(conIcon)
-                conIcon.addIDs(data.routerA.id, data.routerB.id)
+                if (data.routerB != False):
+                    conIcon = ConnectionIcon(data.routerA.center[0],
+                                            data.routerA.center[1],
+                                            data.routerB.center[0],
+                                            data.routerB.center[1])
+                    connections.append(conIcon)
+                    conIcon.addIDs(data.routerA.id, data.routerB.id)
 
-                ### ADD CONNECTIONS ###
-                data.routerA.connections.append(data.routerB)
-                data.routerB.connections.append(data.routerA)
-                weight = 1  #TODO: make weight dynamic
-                if data.routerA.id < data.routerB.id:
-                    network.addLink([data.routerA.id, data.routerB.id, weight])
-                else:
-                    network.addLink([data.routerB.id, data.routerA.id, weight])
-                data.drawingConnection = False
-                data.routerSelected = False
+                    ### ADD CONNECTIONS ###
+                    data.routerA.connections.append(data.routerB)
+                    data.routerB.connections.append(data.routerA)
+                    weight = 1  #TODO: make weight dynamic
+                    if data.routerA.id < data.routerB.id:
+                        network.addLink([data.routerA.id, data.routerB.id, weight])
+                    else:
+                        network.addLink([data.routerB.id, data.routerA.id, weight])
+                    data.drawingConnection = False
+                    data.routerSelected = False
             else:
                 data.drawingConnection = False
                 data.routerSelected = False
@@ -330,8 +309,8 @@ def setupState():
         mx, my = pygame.mouse.get_pos()
         ### REMOVE CONNECTION ###
         removeConnectionAtPoint(mx, my)
-        if isClickingRouter():
-            r = getClickedRouter()
+        r = getClickedRouter()
+        if r != False:
             removeAllConnectionsOfRouter(r)
             i = 0
             for node in routers:
