@@ -133,14 +133,6 @@ class Network():
             links.remove(link)
 
 
-    # this method returns a random True or False value
-    def flipCoin(self):
-        x = random.randint(1, 10)
-        if x == 1:
-            return True
-        return False
-
-
     def assignNode(self):
         x = 1
         assign = len(self.nodes) 
@@ -155,6 +147,16 @@ class Network():
             assign = 1
         return assign
     
+    
     def clear(self):
         self.nodes = []
         self.links = []
+
+            # this method returns a random True or False value
+
+
+    def flipCoin(self):
+        x = random.randint(1, 10)
+        if x == 1:
+            return True
+        return False
