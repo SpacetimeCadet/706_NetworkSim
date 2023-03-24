@@ -1,6 +1,7 @@
 import sys
-import dictionary as dict
+import dictionary as d
 import pprint
+import main as m
 # class Distance_Vector():
 
 # # create infinite variable with largest value possible
@@ -8,12 +9,12 @@ inf = sys.maxsize
 
 def distance_vector(graph, src, dest):
 
-    graph_dict = dict.node_string(graph)
+    graph_dict = d.node_string(graph)
 
     # dictionary of cost and predecessor in each node and 
     # pred will give the path from source node A to pred node
     # cost of each node
-    node = dict.node_dict(graph)
+    node = d.node_dict(graph)
 
     # the cost of first node is 0
     node[src]['cost'] = 0
