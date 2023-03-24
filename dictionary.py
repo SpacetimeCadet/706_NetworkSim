@@ -3,7 +3,7 @@ import sys
 
 inf = sys.maxsize
 
-# converting 
+# function for converting integer nodes to string
 def node_string(graph):
     keys = {}
     values = []
@@ -36,7 +36,7 @@ def node_string(graph):
 
     return d
     
-
+# function to create a node dictionary that initializes starting cost as infinity
 def node_dict(graph):
     key ={}
     for k, v in graph.items():
