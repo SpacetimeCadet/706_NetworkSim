@@ -11,6 +11,17 @@ print("Routers:", n.nodes)
 print("Connections:", n.links)
 print("- - - - -")
 
+print("- - - - -")
+print("Check Connections of Node")
+print("Node: 3")
+print("Connections:", n.getLinksOf(3))
+print("- - - - -")
+
+print("Randomize Network N=10")
+n.randomizeNetwork(10)
+print(n.nodes)
+print(n.links)
+print("- - - - -")
 
 print("- - - - -")
 print("Filtering Duplicate Links")
@@ -69,9 +80,4 @@ print(n.nodes)
 print(n.links)
 print("- - - - -")
 
-
-print("Randomize Network N=10")
-n.randomizeNetwork(10)
-print(n.nodes)
-print(n.links)
-print("- - - - -")
+"""

@@ -20,12 +20,22 @@ class Network():
             # Generate Nodes
             self.nodes = [n for n in range(i)]
 
+
             # Generate Links
             for i in self.nodes:
                 for j in self.nodes:
                     if i != j and self.flipCoin():
                         x = random.randint(0, 50)
                         self.addLink([i, j, x])
+
+            # Ensure All Nodes Are Connected To At Least One Other Node
+            for i in self.nodes:
+                if self.getLinksOf(i) == []:
+                    x = random.randint(0, 50)
+                    if i >= len(self.nodes) - 1:
+                        self.addLink([i, i-1, x])
+                    else:
+                        self.addLink([i, i+1, x])
 
     # this method returns the network formatted into a dictionary
     def toDictionary(self):
