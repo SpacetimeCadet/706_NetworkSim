@@ -37,6 +37,16 @@ class Network():
                     else:
                         self.addLink([i, i+1, x])
 
+            for i in self.nodes:
+                for j in self.nodes:
+                    if i != j and self.getLinksOf(i) == self.getLinksOf(j):
+                        x = random.randint(0, 50)
+                        if j < len(self.nodes) - 1:
+                            self.addLink([j, j+1, x])
+                        elif j == len(self.nodes) - 1 and i > 0:
+                            self.addLink([i, i-1, x])
+                            
+
     # this method returns the network formatted into a dictionary
     def toDictionary(self):
         dict = {}
