@@ -28,6 +28,23 @@ class Network():
                         x = random.randint(0, 50)
                         self.addLink([i, j, x])
 
+            for i in self.nodes:    
+                visited = [] # Set to keep track of visited nodes of graph.
+                graph = self.toDictionary()
+                visited = self.dfs(visited, graph, i)
+                
+                if len(visited) != len(self.nodes):
+                    x = random.randint(0, 50)
+                    n = random.randint(0, len(self.nodes)-1)
+                    while n in visited:
+                        n = random.randint(0, len(self.nodes)-1)
+                    self.addLink([i, n, x])
+                    
+
+
+            
+
+            """
             # Ensure All Nodes Are Connected To At Least One Other Node
             for i in self.nodes:
                 if self.getLinksOf(i) == []:
@@ -46,7 +63,14 @@ class Network():
                             self.addLink([j, j+1, x])
                         elif j == len(self.nodes) - 1 and i > 0:
                             self.addLink([i, i-1, x])
+            """
                             
+    def dfs(self, visited, graph, node):  #function for dfs 
+        if node not in visited:
+            visited.append(node)
+            for neighbour in graph[node]:
+                self.dfs(visited, graph, neighbour)
+        return visited
 
     # this method returns the network formatted into a dictionary
     def toDictionary(self):
