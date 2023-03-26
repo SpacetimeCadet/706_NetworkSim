@@ -28,44 +28,22 @@ class Network():
                         x = random.randint(0, 50)
                         self.addLink([i, j, x])
 
+            # Depth First Search 
             for i in self.nodes:    
                 visited = [] # Set to keep track of visited nodes of graph.
                 graph = self.toDictionary()
                 visited = self.dfs(visited, graph, i)
                 
+                # connect to random unvisited node
                 if len(visited) != len(self.nodes):
                     x = random.randint(0, 50)
                     n = random.randint(0, len(self.nodes)-1)
                     while n in visited:
                         n = random.randint(0, len(self.nodes)-1)
                     self.addLink([i, n, x])
-                    
 
-
-            
-
-            """
-            # Ensure All Nodes Are Connected To At Least One Other Node
-            for i in self.nodes:
-                if self.getLinksOf(i) == []:
-                    x = random.randint(0, 50)
-                    if i >= len(self.nodes) - 1:
-                        self.addLink([i, i-1, x])
-                    else:
-                        self.addLink([i, i+1, x])
-
-            # If The Only Link Between Two Nodes Is Each Other, Add Another Neighbour
-            for i in self.nodes:
-                for j in self.nodes:
-                    if i != j and self.getLinksOf(i) == self.getLinksOf(j):
-                        x = random.randint(0, 50)
-                        if j < len(self.nodes) - 1:
-                            self.addLink([j, j+1, x])
-                        elif j == len(self.nodes) - 1 and i > 0:
-                            self.addLink([i, i-1, x])
-            """
-                            
-    def dfs(self, visited, graph, node):  #function for dfs 
+    # this method returns the list of nodes visited in a depth first search                   
+    def dfs(self, visited, graph, node):
         if node not in visited:
             visited.append(node)
             for neighbour in graph[node]:
@@ -170,19 +148,8 @@ class Network():
 
 
     ### HELPER FUNCTIONS ###
-    def scGetLinksOf(self, node, links):
-        l = []
-        for i in links:
-            if i[0] == node or i[1] == node: # we only want 0 and 1, since 2 is Weight.
-                l.append(i)
-        return l
     
-
-    def scRemoveLink(self, link, links):
-        if link in links:
-            links.remove(link)
-
-
+    # this method returns the lowest numbered node not in the network
     def assignNode(self):
         x = 1
         assign = len(self.nodes) 
@@ -197,16 +164,27 @@ class Network():
             assign = 1
         return assign
     
-
+    # this method reinitializes the network
     def clear(self):
         self.nodes = []
         self.links = []
-
-            # this method returns a random True or False value
-
-
+     
+    # this method returns a random True or False value
     def flipCoin(self):
         x = random.randint(1, 9)
         if x == 1:
             return True
         return False
+
+    # special usecase: removeNode()
+    def scGetLinksOf(self, node, links):
+        l = []
+        for i in links:
+            if i[0] == node or i[1] == node: # we only want 0 and 1, since 2 is Weight.
+                l.append(i)
+        return l
+    
+    # special usecase: removeNode()
+    def scRemoveLink(self, link, links):
+        if link in links:
+            links.remove(link)
