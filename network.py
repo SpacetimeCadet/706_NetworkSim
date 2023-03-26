@@ -37,6 +37,7 @@ class Network():
                     else:
                         self.addLink([i, i+1, x])
 
+            # If The Only Link Between Two Nodes Is Each Other, Add Another Neighbour
             for i in self.nodes:
                 for j in self.nodes:
                     if i != j and self.getLinksOf(i) == self.getLinksOf(j):
