@@ -3,6 +3,7 @@ import dictionary as d
 import pprint
 import main as m
 # class Distance_Vector():
+#was named "distnace_vector.py, corrected to "distance_vector.py" - just in case this broke anything
 
 # # create infinite variable with largest value possible
 inf = sys.maxsize

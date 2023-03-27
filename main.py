@@ -51,8 +51,9 @@ class RouterIcon():
         self.radius = 20
         self.id = id
         self.connections = []
-    def setCoordinates(self,x,y):
-        self.center = (x,y)
+
+    def setCoordinates(self, x, y):
+        self.center = (x, y)
 
 
 class ConnectionIcon():
@@ -71,10 +72,10 @@ class ConnectionIcon():
         self.b = b
 
     def moveStart(self, x, y):
-      self.start = (x,y)
+        self.start = (x, y)
 
-    def moveEnd (self, x, y):
-      self.end = (x,y)
+    def moveEnd(self, x, y):
+        self.end = (x, y)
 
 
 ### INTERFACE FUNCTIONALITY ###
@@ -150,6 +151,7 @@ def getClickedRouter():
     mx, my = pygame.mouse.get_pos()
     return getRouterAt(mx, my)
 
+
 def getRouterAt(x, y):
     for router in routers:
         if x > router.center[0] - router.radius and x < router.center[
@@ -162,6 +164,7 @@ def getRouterAt(x, y):
 
 def isClickingRouter():
     return getClickedRouter != False
+
 
 def disconnectRouters(routerA, routerB):
     i = 0
@@ -235,8 +238,9 @@ def removeAllConnectionsOfRouter(routerA):
             i = i + 1
     routerA.connections.clear()
 
+
 def drawNetwork():
-  #draw all lines
+    #draw all lines
     for connection in connections:
         pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
                          2)
@@ -262,34 +266,42 @@ def drawNetwork():
         pygame.draw.line(screen, (100, 100, 100), data.routerA.center,
                          pygame.mouse.get_pos())
 
-def centreNetwork():
-  #aesthetic method to move the network to the centre of the screen
-  farthestLeft = width
-  farthestRight = 0
-  lowest = height
-  highest = 0
-  for router in routers:
-    if router.center[0] < farthestLeft:
-      farthestLeft = router.center[0]
-    if router.center[0] > farthestRight:
-      farthestRight = router.center[0]
-    if router.center[1] < lowest:
-      lowest = router.center[1]
-    if router.center[1] > highest:
-      highest = router.center[1]
-  screenCentreX = width/2
-  screenCentreY = height/2
-  xOffset = (farthestRight+farthestLeft)/2 - screenCentreX
-  yOffset = (highest+lowest)/2 - screenCentreY
-  for router in routers:
-    router.setCoordinates(router.center[0]-xOffset, router.center[1]-yOffset)
 
-  for connection in connections:
-    connection.moveStart(connection.start[0]-xOffset, connection.start[1]-yOffset)
-    connection.moveEnd(connection.end[0]-xOffset, connection.end[1]-yOffset)
+def centreNetwork():
+    #aesthetic method to move the network to the centre of the screen
+    farthestLeft = width
+    farthestRight = 0
+    lowest = height
+    highest = 0
+    for router in routers:
+        if router.center[0] < farthestLeft:
+            farthestLeft = router.center[0]
+        if router.center[0] > farthestRight:
+            farthestRight = router.center[0]
+        if router.center[1] < lowest:
+            lowest = router.center[1]
+        if router.center[1] > highest:
+            highest = router.center[1]
+    screenCentreX = width / 2
+    screenCentreY = height / 2
+    xOffset = (farthestRight + farthestLeft) / 2 - screenCentreX
+    yOffset = (highest + lowest) / 2 - screenCentreY
+    for router in routers:
+        router.setCoordinates(router.center[0] - xOffset,
+                              router.center[1] - yOffset)
+
+    for connection in connections:
+        connection.moveStart(connection.start[0] - xOffset,
+                             connection.start[1] - yOffset)
+        connection.moveEnd(connection.end[0] - xOffset,
+                           connection.end[1] - yOffset)
 
 
 ### STATES ###
+
+#def animatePath():
+  
+
 def toggleState():
     data.state = (not data.state)
     data.stateSetupDone = False
@@ -299,10 +311,6 @@ def toggleState():
     data.routerSelected = False
     data.routerA = 0
     data.routerB = 0
-
-
-
-    
 
 
 def setupState():
@@ -349,9 +357,9 @@ def setupState():
                 data.routerB = getClickedRouter()
                 if (data.routerB != False):
                     conIcon = ConnectionIcon(data.routerA.center[0],
-                                            data.routerA.center[1],
-                                            data.routerB.center[0],
-                                            data.routerB.center[1])
+                                             data.routerA.center[1],
+                                             data.routerB.center[0],
+                                             data.routerB.center[1])
                     connections.append(conIcon)
                     conIcon.addIDs(data.routerA.id, data.routerB.id)
 
@@ -360,9 +368,11 @@ def setupState():
                     data.routerB.connections.append(data.routerA)
                     weight = 1  #TODO: make weight dynamic
                     if data.routerA.id < data.routerB.id:
-                        network.addLink([data.routerA.id, data.routerB.id, weight])
+                        network.addLink(
+                            [data.routerA.id, data.routerB.id, weight])
                     else:
-                        network.addLink([data.routerB.id, data.routerA.id, weight])
+                        network.addLink(
+                            [data.routerB.id, data.routerA.id, weight])
                     data.drawingConnection = False
                     data.routerSelected = False
             else:
@@ -400,8 +410,6 @@ def setupState():
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
     drawNetwork()
-
-    
 
 
 def traceState():
