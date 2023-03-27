@@ -44,6 +44,7 @@ class Data():
         self.sendingPort = 0
         self.selectingRecievingPort = False
         self.recievingPort = 0
+        self.selectedAlgorithm = "Dijsktra"
 
 
 class RouterIcon():
@@ -95,7 +96,7 @@ def selectAlgorithm():
 
 
 def selectRecievePort():
-    print('Recieve pressed')
+    data.selectingRecievingPort = True
 
 
 def addRouter():
@@ -447,6 +448,25 @@ def traceState():
     pygame.draw.rect(screen, (255, 255, 255),
                      (width * 0.04, height * 0.25, width * 0.92, height * 0.5))
 
+    #display selected ports, algorithm
+    if data.sendingPort == 0:
+      sendID = "not selected"
+    else: 
+      sendID = str(data.sendingPort.id)
+    if data.recievingPort == 0:
+      recieveID = "not selected"
+    else: 
+      recieveID = str(data.recievingPort.id)
+    text("Sending port: " + sendID, theme.medFont,
+             int(0.015 * width), currentStyle.get("buttonTextColour"),
+             width * 0.04, height * 0.77)
+    text("Recieving port: " + recieveID, theme.medFont,
+             int(0.015 * width), currentStyle.get("buttonTextColour"),
+             width * 0.04, height * 0.8)
+    text("Algorithm: " + data.selectedAlgorithm, theme.medFont,
+             int(0.015 * width), currentStyle.get("buttonTextColour"),
+             width * 0.04, height * 0.83)
+
     #Select sending port
     if data.selectingSendingPort:
         text("SELECTING SENDING PORT - click on a router", theme.medFont,
@@ -457,10 +477,31 @@ def traceState():
                 #if a sending port has already been selected, change it back to a regular router
                 if data.sendingPort != 0:
                     data.sendingPort.setColour("buttonColourDark")
+                #sending port cannot be the recieving port
+                if data.recievingPort == getClickedRouter():
+                    data.recievingPort = 0
                 data.sendingPort = getClickedRouter()
                 data.sendingPort.setColour("buttonTextColour")
 
             data.selectingSendingPort = False
+
+    #Select recievinging port
+    if data.selectingRecievingPort:
+        text("SELECTING RECIEVING PORT - click on a router", theme.medFont,
+             int(0.015 * width), currentStyle.get("buttonColourDark"),
+             width * 0.04, height * 0.25)
+        if pygame.mouse.get_pressed()[0]:
+            if isClickingRouter():
+                #if a sending port has already been selected, change it back to a regular router
+                if data.recievingPort != 0:
+                    data.recievingPort.setColour("buttonColourDark")
+                #recieving port cannot be the sending port
+                if data.sendingPort == getClickedRouter():
+                    data.sendingPort = 0
+                data.recievingPort = getClickedRouter()
+                data.recievingPort.setColour("buttonTextColour")
+
+            data.selectingRecievingPort = False
 
     drawNetwork()
 
