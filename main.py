@@ -51,6 +51,8 @@ class RouterIcon():
         self.radius = 20
         self.id = id
         self.connections = []
+    def setCoordinates(self,x,y):
+        self.center = (x,y)
 
 
 class ConnectionIcon():
@@ -67,6 +69,12 @@ class ConnectionIcon():
     def addIDs(self, a, b):
         self.a = a
         self.b = b
+
+    def moveStart(self, x, y):
+      self.start = (x,y)
+
+    def moveEnd (self, x, y):
+      self.end = (x,y)
 
 
 ### INTERFACE FUNCTIONALITY ###
@@ -227,6 +235,59 @@ def removeAllConnectionsOfRouter(routerA):
             i = i + 1
     routerA.connections.clear()
 
+def drawNetwork():
+  #draw all lines
+    for connection in connections:
+        pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
+                         2)
+        ### TODO: use Network function:
+        #                   getWeight(connection.a, connection.b)
+        text(str(connection.weight), theme.lightFont, 15,
+             currentStyle.get("buttonColourLight"),
+             (connection.start[0] + connection.end[0]) / 2,
+             (connection.start[1] + connection.end[1]) / 2)
+
+    #draw all routers
+    i = 0
+    for router in routers:
+        pygame.draw.circle(router.surface, router.color, router.center,
+                           router.radius)
+        text(str(router.id), theme.lightFont, 15,
+             currentStyle.get("titleColour"), router.center[0] - 5,
+             router.center[1] - 5)
+        i = i + 1
+
+    #draw unfinished connection line
+    if data.drawingConnection and data.routerSelected:
+        pygame.draw.line(screen, (100, 100, 100), data.routerA.center,
+                         pygame.mouse.get_pos())
+
+def centreNetwork():
+  #aesthetic method to move the network to the centre of the screen
+  farthestLeft = width
+  farthestRight = 0
+  lowest = height
+  highest = 0
+  for router in routers:
+    if router.center[0] < farthestLeft:
+      farthestLeft = router.center[0]
+    if router.center[0] > farthestRight:
+      farthestRight = router.center[0]
+    if router.center[1] < lowest:
+      lowest = router.center[1]
+    if router.center[1] > highest:
+      highest = router.center[1]
+  screenCentreX = width/2
+  screenCentreY = height/2
+  xOffset = (farthestRight+farthestLeft)/2 - screenCentreX
+  yOffset = (highest+lowest)/2 - screenCentreY
+  for router in routers:
+    router.setCoordinates(router.center[0]-xOffset, router.center[1]-yOffset)
+
+  for connection in connections:
+    connection.moveStart(connection.start[0]-xOffset, connection.start[1]-yOffset)
+    connection.moveEnd(connection.end[0]-xOffset, connection.end[1]-yOffset)
+
 
 ### STATES ###
 def toggleState():
@@ -238,6 +299,10 @@ def toggleState():
     data.routerSelected = False
     data.routerA = 0
     data.routerB = 0
+
+
+
+    
 
 
 def setupState():
@@ -334,32 +399,9 @@ def setupState():
         text("hint: right-click to remove a router/connection", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
+    drawNetwork()
 
-    #draw all lines
-    for connection in connections:
-        pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
-                         2)
-        ### TODO: use Network function:
-        #                   getWeight(connection.a, connection.b)
-        text(str(connection.weight), theme.lightFont, 15,
-             currentStyle.get("buttonColourLight"),
-             (connection.start[0] + connection.end[0]) / 2,
-             (connection.start[1] + connection.end[1]) / 2)
-
-    #draw all routers
-    i = 0
-    for router in routers:
-        pygame.draw.circle(router.surface, router.color, router.center,
-                           router.radius)
-        text(str(router.id), theme.lightFont, 15,
-             currentStyle.get("titleColour"), router.center[0] - 5,
-             router.center[1] - 5)
-        i = i + 1
-
-    #draw unfinished connection line
-    if data.drawingConnection and data.routerSelected:
-        pygame.draw.line(screen, (100, 100, 100), data.routerA.center,
-                         pygame.mouse.get_pos())
+    
 
 
 def traceState():
@@ -376,7 +418,12 @@ def traceState():
             Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
                    fontSize, 'CHANGE ROUTER DATA', toggleState)
         ])
+        centreNetwork()
         data.stateSetupDone = True
+    #drawing panel
+    pygame.draw.rect(screen, (255, 255, 255),
+                     (width * 0.04, height * 0.25, width * 0.92, height * 0.5))
+    drawNetwork()
 
 
 def draw():
