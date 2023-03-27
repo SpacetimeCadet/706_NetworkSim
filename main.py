@@ -118,6 +118,14 @@ def selectAlgorithm():
 def selectRecievePort():
     data.selectingRecievingPort = True
 
+def runAlgorithm():
+    if data.sendingPort != 0 and data.recievingPort != 0:
+      print("placeholder code")
+    else: 
+      text("Please select both a sending router and a receiving router", theme.boldFont,
+             int(0.015 * width), currentStyle.get("buttonTextColour"),
+             width * 0.04, height * 0.86)
+
 
 def addRouter():
     data.drawingRouter = True
@@ -434,7 +442,8 @@ def setupState():
         mx, my = pygame.mouse.get_pos()
         removeConnectionAtPoint(mx, my)
         if isClickingRouter:
-            removeRouter(getClickedRouter())
+            r = getClickedRouter()
+            removeRouter(r)
             
 
     #Tell user if they're drawing router/connection, otherwise display default text
@@ -464,6 +473,8 @@ def traceState():
                    fontSize, 'TOGGLE ALGORITHM', selectAlgorithm),
             Button(width * 0.36, height * 0.18, width * 0.12, height * 0.05,
                    fontSize, 'RECIEVING PORT', selectRecievePort),
+            Button(width * 0.51, height * 0.18, width * 0.12, height * 0.05,
+                   fontSize, 'RUN ALGORITHM', runAlgorithm),
             Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
                    fontSize, 'CHANGE ROUTER DATA', toggleState)
         ])
