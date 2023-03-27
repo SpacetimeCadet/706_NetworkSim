@@ -47,7 +47,7 @@ def Dijsktra(graph, sourceV, destinationV):
     total_nodes = len(graph)
     
     #need to make sure the new source node we choose is not already in the visited list, if it is, we need to choose the next minimum cost node. Otherwise, we will add it to our visted list. Make as a seperate fn to clean up code?
-    for i in range(total_nodes - 1): # minus 1 because range starts at zero, not 1. so to iterate total_Nodes times, we need to write total_nodes minus 1. we halt when we run out of vertices to visit.
+    while next_source != destinationV: # we halt when the greedy algo reaches the destination node specified via the argument destinationV to the fn
         if next_source not in visited:
             visited.append(next_source) #put new vertex into the visited array
             min_heap = []
@@ -65,18 +65,26 @@ def Dijsktra(graph, sourceV, destinationV):
                     heappush(min_heap, (node_states[j].getCost(), j)) #NOTE: heappush() pushes an element into the heap BUT importantly ensures the min heap property is maintained (by default)! We push it 2 values: 1. the cost of the neighbouring node (all neighbours inside the line 53 for loop) and 2. the name of the neighbouring node
                     
                     #print(min_heap) #for debugging
-                   
-        next_source = min_heap[0][1] #now outside of the loop visiting all neighbour nodes (line 55), we want to reassign our current source node (aka next_source) to be the neighbouring node with the least cost, which will be the root node of the min heap data structure. 
-        print(next_source) #for debugging
-        if next_source == destinationV: #could probably change first loop on line 50 to: while(next_source != destinationV):
-            break
+        ## below code added for the scenario when the greedy choose leads to a dead end/sink node and therefore cannot get to the destination node from the greedy chose taken. 
+        if len(min_heap) == 0 and next_source != destinationV:
+            next_source = visited[-2]#return to the previous node (which is not our current source node) in our visisted list. visited[-1] would make the current node our next_source node, which is NOT what we want. we would then get stuck in an infinite loop of visiting the same node.
+            visited.remove(visited[-2])
+            print("We are backtracking to node ", next_source) #for debugging
+        else:         
+        ##---- above code added for that scenario ending       
+            next_source = min_heap[0][1] #now outside of the loop visiting all neighbour nodes (line 55), we want to reassign our current source node (aka next_source) to be the neighbouring node with the least cost, which will be the root node of the min heap data structure. 
+            print("Next source node is ", next_source, "\n") #for debugging
                 
     print("The shorest path from ", sourceV, " to ", destinationV, " is ", node_states[destinationV].getPred() + list(destinationV))
     print("The distance from ", sourceV, " to ", destinationV, " is ", node_states[destinationV].getCost())
+    return(node_states[destinationV].getPred() + list(destinationV))
             
             
             
 
-#Dijsktra(networkGraph1,'A', 'F')
-Dijsktra(networkGraph1,'C', 'A')
+#Dijsktra(networkGraph1,'A', 'F') #should return ['A', 'C', 'E', 'F']
+#Dijsktra(networkGraph1,'C', 'A') #should return ['C', 'A']
+#Dijsktra({'A': {'B':2}, 'B': {'A': 2}},'B', 'A') #should return ['B', 'A']
+#Dijsktra(networkGraph2, 'A', 'E')
+
 
