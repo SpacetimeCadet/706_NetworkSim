@@ -40,13 +40,17 @@ class Data():
         self.routerSelected = False
         self.routerA = 0
         self.routerB = 0
+        self.selectingSendingPort = False
+        self.sendingPort = 0
+        self.selectingRecievingPort = False
+        self.recievingPort = 0
 
 
 class RouterIcon():
     #depicts router on drawing screen, tracks connections
     def __init__(self, x, y, id):
         self.surface = screen
-        self.color = currentStyle.get("buttonColourDark")
+        self.colour = currentStyle.get("buttonColourDark")
         self.center = (x, y)
         self.radius = 20
         self.id = id
@@ -55,12 +59,15 @@ class RouterIcon():
     def setCoordinates(self, x, y):
         self.center = (x, y)
 
+    def setColour(self, colour):
+        self.colour = currentStyle.get(colour)
+
 
 class ConnectionIcon():
     #line between two router icons
     def __init__(self, x1, y1, x2, y2):
         self.surface = screen
-        self.color = (0, 0, 0)
+        self.colour = (0, 0, 0)
         self.start = (x1, y1)
         self.startRouter = getRouterAt(x1, y1)
         self.end = (x2, y2)
@@ -80,7 +87,7 @@ class ConnectionIcon():
 
 ### INTERFACE FUNCTIONALITY ###
 def selectSendPort():
-    print('Send pressed')
+    data.selectingSendingPort = True
 
 
 def selectAlgorithm():
@@ -163,7 +170,14 @@ def getRouterAt(x, y):
 
 
 def isClickingRouter():
-    return getClickedRouter != False
+    mx, my = pygame.mouse.get_pos()
+    for router in routers:
+        if mx > router.center[0] - router.radius and mx < router.center[
+                0] + router.radius:
+            if my > router.center[1] - router.radius and my < router.center[
+                    1] + router.radius:
+                return True
+    return False
 
 
 def disconnectRouters(routerA, routerB):
@@ -254,7 +268,7 @@ def drawNetwork():
     #draw all routers
     i = 0
     for router in routers:
-        pygame.draw.circle(router.surface, router.color, router.center,
+        pygame.draw.circle(router.surface, router.colour, router.center,
                            router.radius)
         text(str(router.id), theme.lightFont, 15,
              currentStyle.get("titleColour"), router.center[0] - 5,
@@ -300,7 +314,7 @@ def centreNetwork():
 ### STATES ###
 
 #def animatePath():
-  
+
 
 def toggleState():
     data.state = (not data.state)
@@ -351,11 +365,11 @@ def setupState():
         if data.drawingConnection:
             if not data.routerSelected:
                 data.routerA = getClickedRouter()
-                if (data.routerA != False):
+                if (data.routerA != 0):
                     data.routerSelected = True
             elif data.routerSelected:
                 data.routerB = getClickedRouter()
-                if (data.routerB != False):
+                if (data.routerB != 0):
                     conIcon = ConnectionIcon(data.routerA.center[0],
                                              data.routerA.center[1],
                                              data.routerB.center[0],
@@ -428,9 +442,26 @@ def traceState():
         ])
         centreNetwork()
         data.stateSetupDone = True
+
     #drawing panel
     pygame.draw.rect(screen, (255, 255, 255),
                      (width * 0.04, height * 0.25, width * 0.92, height * 0.5))
+
+    #Select sending port
+    if data.selectingSendingPort:
+        text("SELECTING SENDING PORT - click on a router", theme.medFont,
+             int(0.015 * width), currentStyle.get("buttonColourDark"),
+             width * 0.04, height * 0.25)
+        if pygame.mouse.get_pressed()[0]:
+            if isClickingRouter():
+                #if a sending port has already been selected, change it back to a regular router
+                if data.sendingPort != 0:
+                    data.sendingPort.setColour("buttonColourDark")
+                data.sendingPort = getClickedRouter()
+                data.sendingPort.setColour("buttonTextColour")
+
+            data.selectingSendingPort = False
+
     drawNetwork()
 
 
