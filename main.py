@@ -2,7 +2,7 @@ import os
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
-import pygame, sys, string, math, theme, datetime, random
+import pygame, sys, string, math, theme, datetime, random, time
 from button import Button
 from pygame.locals import QUIT
 from network import Network
@@ -23,6 +23,8 @@ objects = []
 routers = []
 connections = []
 network = Network([], [])  #empty lists create empty Network
+animationRouters = []
+animationConnections = []
 
 #style: 1 = teal theme, network background, 2 = blue theme, spiral background
 theme.style = 1
@@ -45,13 +47,14 @@ class Data():
         self.selectingRecievingPort = False
         self.recievingPort = 0
         self.selectedAlgorithm = "Dijsktra"
+        self.runAnimation = False
 
     def toggleAlgorithm(self):
-      if self.selectedAlgorithm == "Dijsktra":
-        self.selectedAlgorithm = "Bellman-Ford"
-      else: 
-        self.selectedAlgorithm = "Dijsktra"
-        
+        if self.selectedAlgorithm == "Dijsktra":
+            self.selectedAlgorithm = "Bellman-Ford"
+        else:
+            self.selectedAlgorithm = "Dijsktra"
+
     def refresh(self):
         self.state = True
         self.stateSetupDone = False
@@ -64,7 +67,7 @@ class Data():
         self.sendingPort = 0
         self.selectingRecievingPort = False
         self.recievingPort = 0
-        self.selectedAlgorithm = "Dijsktra"
+        self.runAnimation = False
 
 
 class RouterIcon():
@@ -105,6 +108,12 @@ class ConnectionIcon():
     def moveEnd(self, x, y):
         self.end = (x, y)
 
+    def setColour(self, colour):
+        self.colour = currentStyle.get(colour)
+
+    def turnBlack(self):
+        self.colour = (0, 0, 0)
+
 
 ### INTERFACE FUNCTIONALITY ###
 def selectSendPort():
@@ -118,13 +127,16 @@ def selectAlgorithm():
 def selectRecievePort():
     data.selectingRecievingPort = True
 
+
 def runAlgorithm():
     if data.sendingPort != 0 and data.recievingPort != 0:
-      print("placeholder code")
-    else: 
-      text("Please select both a sending router and a receiving router", theme.boldFont,
-             int(0.015 * width), currentStyle.get("buttonTextColour"),
-             width * 0.04, height * 0.86)
+        #placeholder
+        formAnimation([1, 2, 3, 4])
+        data.runAnimation = True
+    else:
+        text("Please select both a sending router and a receiving router",
+             theme.boldFont, int(0.015 * width),
+             currentStyle.get("buttonTextColour"), width * 0.04, height * 0.86)
 
 
 def addRouter():
@@ -282,6 +294,7 @@ def removeAllConnectionsOfRouter(routerA):
             i = i + 1
     routerA.connections.clear()
 
+
 def removeRouter(r):
     removeAllConnectionsOfRouter(r)
     i = 0
@@ -290,9 +303,9 @@ def removeRouter(r):
             network.removeNode(r.id)
             routers.pop(i)
             if data.sendingPort == r:
-              data.sendingPort = 0
+                data.sendingPort = 0
             if data.recievingPort == r:
-              data.recievingPort = 0
+                data.recievingPort = 0
             break
         i = i + 1
 
@@ -300,8 +313,8 @@ def removeRouter(r):
 def drawNetwork():
     #draw all lines
     for connection in connections:
-        pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
-                         2)
+        pygame.draw.line(screen, connection.colour, connection.start,
+                         connection.end, 2)
         ### TODO: use Network function:
         #                   getWeight(connection.a, connection.b)
         text(str(connection.weight), theme.lightFont, 15,
@@ -357,10 +370,51 @@ def centreNetwork():
 
 ### STATES ###
 
-#def animatePath():
+
+def formAnimation(nodeIDs):
+    #turns list of node id's into an animation
+    animationRouters.clear()
+    animationConnections.clear()
+    for nodeID in nodeIDs:
+        for router in routers:
+            if router.id == nodeID:
+                animationRouters.append(router)
+                break
+
+    for i in range(1, len(animationRouters)):
+        for connection in connections:
+            if connection.start == animationRouters[
+                    i -
+                    1].center or connection.end == animationRouters[i -
+                                                                    1].center:
+                if connection.start == animationRouters[
+                        i].center or connection.end == animationRouters[
+                            i].center:
+                    animationConnections.append(connection)
+                    break
+
+
+def animate():
+    #run animation with 1s per stage
+    #at each stage, light up the next step, darken the last
+    length = len(animationConnections) + len(animationRouters)
+    stage = int(time.time()) % length
+    if stage == 0:
+        animationRouters[len(animationRouters) -
+                         1].setColour("buttonColourDark")
+        animationConnections[len(animationConnections) - 1].turnBlack()
+    if stage % 2 == 0:
+        animationRouters[int(stage / 2)].setColour("buttonTextColour")
+        animationConnections[(int(stage / 2)) - 1].turnBlack()
+    else:
+        animationRouters[int((stage - 1) / 2)].setColour("buttonColourDark")
+        animationConnections[int(
+            (stage - 1) / 2)].setColour("buttonTextColour")
 
 
 def toggleState():
+    #add check for a connected network when switching from setup to trace
+    #send drawn graph to network
     data.state = (not data.state)
     data.stateSetupDone = False
     objects.clear()
@@ -444,7 +498,6 @@ def setupState():
         if isClickingRouter:
             r = getClickedRouter()
             removeRouter(r)
-            
 
     #Tell user if they're drawing router/connection, otherwise display default text
     if data.drawingRouter:
@@ -487,22 +540,20 @@ def traceState():
 
     #display selected ports, algorithm
     if data.sendingPort == 0:
-      sendID = "not selected"
-    else: 
-      sendID = str(data.sendingPort.id)
+        sendID = "not selected"
+    else:
+        sendID = str(data.sendingPort.id)
     if data.recievingPort == 0:
-      recieveID = "not selected"
-    else: 
-      recieveID = str(data.recievingPort.id)
-    text("Sending port: " + sendID, theme.medFont,
-             int(0.015 * width), currentStyle.get("buttonTextColour"),
-             width * 0.04, height * 0.77)
-    text("Recieving port: " + recieveID, theme.medFont,
-             int(0.015 * width), currentStyle.get("buttonTextColour"),
-             width * 0.04, height * 0.8)
+        recieveID = "not selected"
+    else:
+        recieveID = str(data.recievingPort.id)
+    text("Sending port: " + sendID, theme.medFont, int(0.015 * width),
+         currentStyle.get("buttonTextColour"), width * 0.04, height * 0.77)
+    text("Recieving port: " + recieveID, theme.medFont, int(0.015 * width),
+         currentStyle.get("buttonTextColour"), width * 0.04, height * 0.8)
     text("Algorithm: " + data.selectedAlgorithm, theme.medFont,
-             int(0.015 * width), currentStyle.get("buttonTextColour"),
-             width * 0.04, height * 0.83)
+         int(0.015 * width), currentStyle.get("buttonTextColour"),
+         width * 0.04, height * 0.83)
 
     #Select sending port
     if data.selectingSendingPort:
@@ -539,6 +590,9 @@ def traceState():
                 data.recievingPort.setColour("buttonTextColour")
 
             data.selectingRecievingPort = False
+
+    if data.runAnimation:
+        animate()
 
     drawNetwork()
 
