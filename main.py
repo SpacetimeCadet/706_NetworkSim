@@ -46,6 +46,12 @@ class Data():
         self.recievingPort = 0
         self.selectedAlgorithm = "Dijsktra"
 
+    def toggleAlgorithm(self):
+      if self.selectedAlgorithm == "Dijsktra":
+        self.selectedAlgorithm = "Bellman-Ford"
+      else: 
+        self.selectedAlgorithm = "Dijsktra"
+
 
 class RouterIcon():
     #depicts router on drawing screen, tracks connections
@@ -92,7 +98,7 @@ def selectSendPort():
 
 
 def selectAlgorithm():
-    print('Algorithm pressed')
+    data.toggleAlgorithm()
 
 
 def selectRecievePort():
@@ -434,9 +440,9 @@ def traceState():
         objects.extend([
             Button(width * 0.04, height * 0.18, width * 0.12, height * 0.05,
                    fontSize, 'SENDING PORT', selectSendPort),
-            Button(width * 0.19, height * 0.18, width * 0.12, height * 0.05,
-                   fontSize, 'ALGORITHM', selectAlgorithm),
-            Button(width * 0.34, height * 0.18, width * 0.12, height * 0.05,
+            Button(width * 0.19, height * 0.18, width * 0.14, height * 0.05,
+                   fontSize, 'TOGGLE ALGORITHM', selectAlgorithm),
+            Button(width * 0.36, height * 0.18, width * 0.12, height * 0.05,
                    fontSize, 'RECIEVING PORT', selectRecievePort),
             Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
                    fontSize, 'CHANGE ROUTER DATA', toggleState)
