@@ -51,6 +51,20 @@ class Data():
         self.selectedAlgorithm = "Bellman-Ford"
       else: 
         self.selectedAlgorithm = "Dijsktra"
+        
+    def refresh(self):
+        self.state = True
+        self.stateSetupDone = False
+        self.drawingRouter = False
+        self.drawingConnection = False
+        self.routerSelected = False
+        self.routerA = 0
+        self.routerB = 0
+        self.selectingSendingPort = False
+        self.sendingPort = 0
+        self.selectingRecievingPort = False
+        self.recievingPort = 0
+        self.selectedAlgorithm = "Dijsktra"
 
 
 class RouterIcon():
@@ -143,6 +157,7 @@ def clearData():
     network.clear()
     connections.clear()
     routers.clear()
+    data.refresh()
 
 
 def printDebug():
@@ -258,6 +273,20 @@ def removeAllConnectionsOfRouter(routerA):
                 break
             i = i + 1
     routerA.connections.clear()
+
+def removeRouter(r):
+    removeAllConnectionsOfRouter(r)
+    i = 0
+    for node in routers:
+        if node == r:
+            network.removeNode(r.id)
+            routers.pop(i)
+            if data.sendingPort == r:
+              data.sendingPort = 0
+            if data.recievingPort == r:
+              data.recievingPort = 0
+            break
+        i = i + 1
 
 
 def drawNetwork():
@@ -403,19 +432,10 @@ def setupState():
     #deletion
     if pygame.mouse.get_pressed()[2]:
         mx, my = pygame.mouse.get_pos()
-        ### REMOVE CONNECTION ###
         removeConnectionAtPoint(mx, my)
-        r = getClickedRouter()
-        if r != False:
-            removeAllConnectionsOfRouter(r)
-            i = 0
-            for node in routers:
-                if node == r:
-                    ### REMOVE ROUTER ###
-                    network.removeNode(r.id)
-                    routers.pop(i)
-                    break
-                i = i + 1
+        if isClickingRouter:
+            removeRouter(getClickedRouter())
+            
 
     #Tell user if they're drawing router/connection, otherwise display default text
     if data.drawingRouter:
