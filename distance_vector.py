@@ -8,7 +8,7 @@ import main as m
 # # create infinite variable with largest value possible
 inf = sys.maxsize
 
-def distance_vector(graph, src, dest):
+def dist_vec(graph, src, dest):
 
     graph_dict = d.node_string(graph)
 
@@ -69,4 +69,4 @@ source = str(source_node)
 # dest_node = input("Enter destination node: ")
 dest_node = 4
 destination = str(dest_node)
-distance_vector(graph, source, destination)
+dist_vec(graph, source, destination)
