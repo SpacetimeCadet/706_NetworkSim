@@ -151,7 +151,7 @@ class Network():
     
     # this method returns the lowest numbered node not in the network
     def assignNode(self):
-        x = 1
+        x = 0
         assign = len(self.nodes) 
         for i in self.nodes:
             if i != x:
@@ -160,8 +160,8 @@ class Network():
             x = x + 1
             assign = x
 
-        if assign < 1:
-            assign = 1
+        if assign < 0:
+            assign = 0
         return assign
     
     # this method reinitializes the network

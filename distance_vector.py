@@ -1,8 +1,6 @@
 import dictionary as d
 import pprint
 
-
-# create infinite variable with largest value possible
 inf = float('inf')
 
 def dist_vec(graph, source, destination):
@@ -18,9 +16,6 @@ def dist_vec(graph, source, destination):
 
     # the cost of first node is 0
     node_data[src]['cost'] = 0
-
-    cost_node = []
-    distance = []
 
     for i in range(len(graph_dict) - 1):
         # printing iteration number
@@ -54,11 +49,11 @@ def dist_vec(graph, source, destination):
     # detecting negative cycle
     # after (number of nodes - 1) iterations 
     # if the cost of any nodes changes (lesser cost) then there is a negative cycle
-    # for itr in graph_dict:
-    #     for neighbour in graph_dict[itr]:
-    #         if (node_data[itr]['cost'] + graph_dict[itr][neighbour] < node_data[neighbour]['cost'] and cost != inf):
-    #             print("Negative cycle detected") 
-    #             return
+    for itr in graph_dict:
+        for neighbor in graph_dict[itr]:
+            if (node_data[itr]['cost'] + graph_dict[itr][neighbor] < node_data[neighbor]['cost'] and cost != inf):
+                print("Negative cycle detected") 
+                return
 
     least_cost = node_data[dest]['cost']
     #print("Least Cost: " ,least_cost)
@@ -103,4 +98,5 @@ def dist_vec(graph, source, destination):
 # destination = 4
 # g = dist_vec(graph, source, destination)
 # print(g)
+
 
