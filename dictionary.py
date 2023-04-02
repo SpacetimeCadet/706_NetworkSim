@@ -1,7 +1,5 @@
 
-import sys
-
-inf = sys.maxsize
+inf = float('inf')
 
 # function for converting integer nodes to string
 def node_string(graph):
