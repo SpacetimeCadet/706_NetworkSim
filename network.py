@@ -58,8 +58,11 @@ class Network():
             list = self.scGetLinksOf(i, links)
             connections = {}
             for j in list:
-                connections[j[1]] = j[2]
-                self.scRemoveLink(j, links)
+                if j[0] == i:
+                    connections[j[1]] = j[2]
+                else:
+                    connections[j[0]] = j[2]
+                #self.scRemoveLink(j, links)
             dict[i] = connections
         return dict
     
