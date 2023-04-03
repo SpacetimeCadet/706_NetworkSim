@@ -12,6 +12,12 @@ print("Connections:", n.links)
 print("- - - - -")
 
 print("- - - - -")
+print("toDictionary")
+temp = n.toDictionary()
+print (temp)
+print("- - - - -")
+
+print("- - - - -")
 print("Check Connections of Node")
 print("Node: 3")
 print("Connections:", n.getLinksOf(3))
@@ -79,5 +85,3 @@ n.addNode(n.assignNode()) # the list is sorted after new nodes are added.
 print(n.nodes)
 print(n.links)
 print("- - - - -")
-
-"""
