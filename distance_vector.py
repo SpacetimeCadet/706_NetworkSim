@@ -74,8 +74,8 @@ def dist_vec(graph, source, destination):
                 if (i==path_node[itr] and j==path_node[itr+1]):
                     shortest_path.append([i,j,graph[i][j]])
                     break 
-    return shortest_path
-
+    #return shortest_path
+    return path_node
 
 # if __name__ == "__main__":
 
