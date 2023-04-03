@@ -131,25 +131,33 @@ def selectRecievePort():
 
 def runAlgorithm():
     if data.sendingPort != 0 and data.recievingPort != 0:
+        nodesToAnimate = []
         graph = network.toDictionary()
-        printDebug()
         if data.selectedAlgorithm == "Dijsktra":
+            printDebug()
+            print("sending port: " + str(data.sendingPort.id))
+            print("recieving port: " + str(data.recievingPort.id))
             nodeList = Dijsktra(graph, str(data.sendingPort.id),
                                 str(data.recievingPort.id))
         else:
-            nodeList = dist_vec(graph, str(data.sendingPort.id),
-                                str(data.recievingPort.id))
-        #print("node list: " + nodeList)
-        nodesToAnimate = []
-        for i in range(len(nodeList)):
-            nodesToAnimate.append(nodeList[i][0])
-            print(str(nodeList[i][0]))
-        nodesToAnimate.append(nodeList[len(nodeList)-1][1])
-        print(str(nodeList[len(nodeList)-1][1]))
-        formAnimation(nodesToAnimate)
-        #placeholder
-        #formAnimation([1, 2, 3, 4])
-        data.runAnimation = True
+            #Bellman-Ford gives a 2D array instead of a list of nodes
+            #nodeList = dist_vec(graph, str(data.sendingPort.id),
+            #                    str(data.recievingPort.id))
+            printDebug()
+            print("sending port: " + str(data.sendingPort.id))
+            print("recieving port: " + str(data.recievingPort.id))
+            nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
+                                data.recievingPort.id)
+            print("Node list length: " + str(len(nodeList)))
+            for i in range(len(nodeList)):
+                nodesToAnimate.append(nodeList[i][0])
+                print(str(nodeList[i][0]))
+            nodesToAnimate.append(data.recievingPort.id)
+        if len(nodesToAnimate) > 1:
+            formAnimation(nodesToAnimate)
+            data.runAnimation = True
+        else:
+            print("at least 2 nodes required for animation")
     else:
         text("Please select both a sending router and a receiving router",
              theme.boldFont, int(0.015 * width),
@@ -414,12 +422,12 @@ def animate():
     #run animation with 1s per stage
     #at each stage, light up the next step, darken the last
     length = len(animationConnections) + len(animationRouters)
-    if length != 0:
+    if length < 1:
         stage = int(time.time()) % length
         if stage == 0:
             animationRouters[len(animationRouters) -
                             1].setColour("buttonColourDark")
-            animationConnections[len(animationConnections) - 1].turnBlack()
+            animationConnections[-1].turnBlack()
         if stage % 2 == 0:
             animationRouters[int(stage / 2)].setColour("buttonTextColour")
             animationConnections[(int(stage / 2)) - 1].turnBlack()
@@ -427,8 +435,6 @@ def animate():
             animationRouters[int((stage - 1) / 2)].setColour("buttonColourDark")
             animationConnections[int(
                 (stage - 1) / 2)].setColour("buttonTextColour")
-    else:
-        print("path has a length of 0")
 
 
 def toggleState():
