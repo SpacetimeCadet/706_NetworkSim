@@ -18,7 +18,6 @@ width = 1200
 
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 pygame.display.set_caption('Connection Model')
-clock = pygame.time.Clock()
 
 objects = []
 routers = []
@@ -171,13 +170,13 @@ def addConnection():
 def randomizeNetwork():
     clearData()
     network.randomizeNetwork(random.randint(2, 12))
-    for node in network.nodes:
-        randx = random.randint(width * 0.1, width * 0.9)
-        randy = random.randint(height * 0.30, height * 0.70)
-        while getRouterAt(randx, randy) != False:
-            randx = random.randint(width * 0.1, width * 0.9)
-            randy = random.randint(height * 0.30, height * 0.70)
-        routers.append(RouterIcon(randx, randy, node))
+    numNodes = len(network.nodes)
+    radius = height*0.2
+    num = math.pi*2/numNodes
+    for i in range(numNodes):
+        x = math.cos(num*i)*radius+(width/2)
+        y = math.sin(num*i)*radius+(height/2)
+        routers.append(RouterIcon(x, y, network.nodes[i]))
     for link in network.links:
         startID = link[0]
         endID = link[1]
