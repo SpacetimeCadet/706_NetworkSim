@@ -1,5 +1,6 @@
 import pygame
 import theme
+from mouse import Mouse
 pygame.init()
 
 height = 600

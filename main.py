@@ -2,22 +2,23 @@ import os
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
-import pygame, sys, string, math, theme, datetime, random, time
+import pygame, sys, math, theme, datetime, random, time
 from button import Button
+from mouse import Mouse
 from pygame.locals import QUIT
 from network import Network
-import random
+from distance_vector import dist_vec
+from dijsktra3 import Dijsktra
 
 pygame.init()
 
 #Screen setup
-#original size: Height = 1120, Width = 2025
-
 height = 600
 width = 1200
 
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 pygame.display.set_caption('Connection Model')
+clock = pygame.time.Clock()
 
 objects = []
 routers = []
@@ -68,6 +69,7 @@ class Data():
         self.selectingRecievingPort = False
         self.recievingPort = 0
         self.runAnimation = False
+        
 
 
 class RouterIcon():
@@ -130,8 +132,24 @@ def selectRecievePort():
 
 def runAlgorithm():
     if data.sendingPort != 0 and data.recievingPort != 0:
+        graph = network.toDictionary()
+        printDebug()
+        if data.selectedAlgorithm == "Dijsktra":
+            nodeList = Dijsktra(graph, str(data.sendingPort.id),
+                                str(data.recievingPort.id))
+        else:
+            nodeList = dist_vec(graph, str(data.sendingPort.id),
+                                str(data.recievingPort.id))
+        #print("node list: " + nodeList)
+        nodesToAnimate = []
+        for i in range(len(nodeList)):
+            nodesToAnimate.append(nodeList[i][0])
+            print(str(nodeList[i][0]))
+        nodesToAnimate.append(nodeList[len(nodeList)-1][1])
+        print(str(nodeList[len(nodeList)-1][1]))
+        formAnimation(nodesToAnimate)
         #placeholder
-        formAnimation([1, 2, 3, 4])
+        #formAnimation([1, 2, 3, 4])
         data.runAnimation = True
     else:
         text("Please select both a sending router and a receiving router",
@@ -208,7 +226,6 @@ def getRouterAt(x, y):
             if y > router.center[1] - router.radius and y < router.center[
                     1] + router.radius:
                 return router
-    return False
 
 
 def isClickingRouter():
@@ -333,7 +350,7 @@ def drawNetwork():
         i = i + 1
 
     #draw unfinished connection line
-    if data.drawingConnection and data.routerSelected:
+    if data.drawingConnection and data.routerSelected and data.routerA != 0:
         pygame.draw.line(screen, (100, 100, 100), data.routerA.center,
                          pygame.mouse.get_pos())
 
@@ -398,18 +415,21 @@ def animate():
     #run animation with 1s per stage
     #at each stage, light up the next step, darken the last
     length = len(animationConnections) + len(animationRouters)
-    stage = int(time.time()) % length
-    if stage == 0:
-        animationRouters[len(animationRouters) -
-                         1].setColour("buttonColourDark")
-        animationConnections[len(animationConnections) - 1].turnBlack()
-    if stage % 2 == 0:
-        animationRouters[int(stage / 2)].setColour("buttonTextColour")
-        animationConnections[(int(stage / 2)) - 1].turnBlack()
+    if length != 0:
+        stage = int(time.time()) % length
+        if stage == 0:
+            animationRouters[len(animationRouters) -
+                            1].setColour("buttonColourDark")
+            animationConnections[len(animationConnections) - 1].turnBlack()
+        if stage % 2 == 0:
+            animationRouters[int(stage / 2)].setColour("buttonTextColour")
+            animationConnections[(int(stage / 2)) - 1].turnBlack()
+        else:
+            animationRouters[int((stage - 1) / 2)].setColour("buttonColourDark")
+            animationConnections[int(
+                (stage - 1) / 2)].setColour("buttonTextColour")
     else:
-        animationRouters[int((stage - 1) / 2)].setColour("buttonColourDark")
-        animationConnections[int(
-            (stage - 1) / 2)].setColour("buttonTextColour")
+        print("path has a length of 0")
 
 
 def toggleState():
@@ -450,22 +470,19 @@ def setupState():
     pygame.draw.rect(screen, (255, 255, 255),
                      (width * 0.04, height * 0.25, width * 0.92, height * 0.5))
 
-    if pygame.mouse.get_pressed()[0]:
+    mx, my = pygame.mouse.get_pos()
+    if mouse.isLeftClicking and onDrawingArea(mx, my):
         #add new router
         if data.drawingRouter:
-            mx, my = pygame.mouse.get_pos()
-            if onDrawingArea(mx, my):
-                ### ADD ROUTER ###
-                routers.append(RouterIcon(mx, my, network.assignNode()))
-                network.addNode(network.assignNode())
-                data.drawingRouter = False
+            routers.append(RouterIcon(mx, my, network.assignNode()))
+            network.addNode(network.assignNode())
+            data.drawingRouter = False
         #add new connection
         if data.drawingConnection:
-            if not data.routerSelected:
+            if not data.routerSelected and isClickingRouter():
                 data.routerA = getClickedRouter()
-                if (data.routerA != 0):
-                    data.routerSelected = True
-            elif data.routerSelected:
+                data.routerSelected = True
+            elif data.routerSelected and isClickingRouter():
                 data.routerB = getClickedRouter()
                 if (data.routerB != 0):
                     conIcon = ConnectionIcon(data.routerA.center[0],
@@ -492,7 +509,7 @@ def setupState():
                 data.routerSelected = False
 
     #deletion
-    if pygame.mouse.get_pressed()[2]:
+    if mouse.isRightClicking:
         mx, my = pygame.mouse.get_pos()
         removeConnectionAtPoint(mx, my)
         if isClickingRouter:
@@ -526,10 +543,10 @@ def traceState():
                    fontSize, 'TOGGLE ALGORITHM', selectAlgorithm),
             Button(width * 0.36, height * 0.18, width * 0.12, height * 0.05,
                    fontSize, 'RECIEVING PORT', selectRecievePort),
-            Button(width * 0.51, height * 0.18, width * 0.12, height * 0.05,
-                   fontSize, 'RUN ALGORITHM', runAlgorithm),
-            Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
-                   fontSize, 'CHANGE ROUTER DATA', toggleState)
+            Button(width * 0.51, height * 0.18, width * 0.2, height * 0.05,
+                   fontSize, 'CHANGE ROUTER DATA', toggleState),
+            Button(width * 0.6, height * 0.8, width * 0.2, height * 0.05,
+                   fontSize, 'RUN ALGORITHM', runAlgorithm)
         ])
         centreNetwork()
         data.stateSetupDone = True
@@ -560,7 +577,7 @@ def traceState():
         text("SELECTING SENDING PORT - click on a router", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
-        if pygame.mouse.get_pressed()[0]:
+        if mouse.isLeftClicking:
             if isClickingRouter():
                 #if a sending port has already been selected, change it back to a regular router
                 if data.sendingPort != 0:
@@ -578,7 +595,7 @@ def traceState():
         text("SELECTING RECIEVING PORT - click on a router", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
-        if pygame.mouse.get_pressed()[0]:
+        if mouse.isLeftClicking:
             if isClickingRouter():
                 #if a sending port has already been selected, change it back to a regular router
                 if data.recievingPort != 0:
@@ -632,8 +649,10 @@ def centreText(words, font, size, colour, y):
 
 ### GAME LOOP ###
 data = Data()
+mouse = Mouse()
 while True:
-    event = pygame.event.wait()
+    #event = pygame.event.wait() <- seems to cause the animation to bug
+    
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -653,7 +672,9 @@ while True:
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
             data.stateSetupDone = False
             objects.clear()
-
+    
+    mouse.update()
+    
     draw()
     pygame.display.update()
     #fpsClock.tick(fps)
