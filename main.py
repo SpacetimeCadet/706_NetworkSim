@@ -5,6 +5,7 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 import pygame, sys, math, theme, datetime, random, time
 from button import Button
 from mouse import Mouse
+from data import Data
 from pygame.locals import QUIT
 from network import Network
 from distance_vector import dist_vec
@@ -32,44 +33,6 @@ currentStyle = theme.currentTheme()
 
 
 ### DATA STRUCTURES ###
-class Data():
-    #keep track of central variables
-    def __init__(self):
-        self.state = True
-        self.stateSetupDone = False
-        self.drawingRouter = False
-        self.drawingConnection = False
-        self.routerSelected = False
-        self.routerA = 0
-        self.routerB = 0
-        self.selectingSendingPort = False
-        self.sendingPort = 0
-        self.selectingRecievingPort = False
-        self.recievingPort = 0
-        self.selectedAlgorithm = "Dijsktra"
-        self.runAnimation = False
-
-    def toggleAlgorithm(self):
-        if self.selectedAlgorithm == "Dijsktra":
-            self.selectedAlgorithm = "Bellman-Ford"
-        else:
-            self.selectedAlgorithm = "Dijsktra"
-
-    def refresh(self):
-        self.state = True
-        self.stateSetupDone = False
-        self.drawingRouter = False
-        self.drawingConnection = False
-        self.routerSelected = False
-        self.routerA = 0
-        self.routerB = 0
-        self.selectingSendingPort = False
-        self.sendingPort = 0
-        self.selectingRecievingPort = False
-        self.recievingPort = 0
-        self.runAnimation = False
-        
-
 
 class RouterIcon():
     #depicts router on drawing screen, tracks connections
@@ -131,14 +94,23 @@ def selectRecievePort():
 
 def runAlgorithm():
     if data.sendingPort != 0 and data.recievingPort != 0:
-        nodesToAnimate = []
         graph = network.toDictionary()
         if data.selectedAlgorithm == "Dijsktra":
+            #placeholder for testing
+            graph2 = {
+                '1': {'2':1, '3':1},
+                '2': {'1':1, '3':1, '4':1},
+                '3': {'1':1, '2':1, '5':1},
+                '4': {'2':1, '5':1, '6':1},
+                '5': {'3':1, '4':1},
+                '6': {'4':1}
+            }
             printDebug()
             print("sending port: " + str(data.sendingPort.id))
             print("recieving port: " + str(data.recievingPort.id))
-            nodeList = Dijsktra(graph, str(data.sendingPort.id),
-                                str(data.recievingPort.id))
+            nodeList = Dijsktra(graph2, str(data.sendingPort.id), str(data.recievingPort.id))
+            print("nodeList length: " + str(len(nodeList)))
+            print(*nodeList)
         else:
             #Bellman-Ford gives a 2D array instead of a list of nodes
             #nodeList = dist_vec(graph, str(data.sendingPort.id),
@@ -149,15 +121,10 @@ def runAlgorithm():
             nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
                                 data.recievingPort.id)
             print("Node list length: " + str(len(nodeList)))
-            for i in range(len(nodeList)):
-                nodesToAnimate.append(nodeList[i][0])
-                print(str(nodeList[i][0]))
-            nodesToAnimate.append(data.recievingPort.id)
-        if len(nodesToAnimate) > 1:
-            formAnimation(nodesToAnimate)
-            data.runAnimation = True
-        else:
-            print("at least 2 nodes required for animation")
+            
+        formAnimation(nodeList)
+        data.runAnimation = True
+            
     else:
         text("Please select both a sending router and a receiving router",
              theme.boldFont, int(0.015 * width),
@@ -397,6 +364,8 @@ def centreNetwork():
 
 def formAnimation(nodeIDs):
     #turns list of node id's into an animation
+    #for some reason, thinks nodeIDs length == 0
+    print("length of nodeIDs: " + str(len(nodeIDs)))
     animationRouters.clear()
     animationConnections.clear()
     for nodeID in nodeIDs:
@@ -422,7 +391,7 @@ def animate():
     #run animation with 1s per stage
     #at each stage, light up the next step, darken the last
     length = len(animationConnections) + len(animationRouters)
-    if length < 1:
+    if length > 1:
         stage = int(time.time()) % length
         if stage == 0:
             animationRouters[len(animationRouters) -
