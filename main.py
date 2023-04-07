@@ -31,8 +31,8 @@ animationConnections = []
 theme.style = 1
 currentStyle = theme.currentTheme()
 
-
 ### DATA STRUCTURES ###
+
 
 class RouterIcon():
     #depicts router on drawing screen, tracks connections
@@ -98,17 +98,41 @@ def runAlgorithm():
         if data.selectedAlgorithm == "Dijsktra":
             #placeholder for testing
             graph2 = {
-                '1': {'2':1, '3':1},
-                '2': {'1':1, '3':1, '4':1},
-                '3': {'1':1, '2':1, '5':1},
-                '4': {'2':1, '5':1, '6':1},
-                '5': {'3':1, '4':1},
-                '6': {'4':1}
+                '1': {
+                    '2': 1,
+                    '3': 1
+                },
+                '2': {
+                    '1': 1,
+                    '3': 1,
+                    '4': 1
+                },
+                '3': {
+                    '1': 1,
+                    '2': 1,
+                    '5': 1
+                },
+                '4': {
+                    '2': 1,
+                    '5': 1,
+                    '6': 1
+                },
+                '5': {
+                    '3': 1,
+                    '4': 1
+                },
+                '6': {
+                    '4': 1
+                }
             }
             printDebug()
             print("sending port: " + str(data.sendingPort.id))
             print("recieving port: " + str(data.recievingPort.id))
-            nodeList = Dijsktra(graph2, str(data.sendingPort.id), str(data.recievingPort.id))
+            stringList = Dijsktra(graph2, str(data.sendingPort.id),
+                                str(data.recievingPort.id))
+            nodeList = []
+            for node in stringList:
+                nodeList.append(int(node))            
             print("nodeList length: " + str(len(nodeList)))
             print(*nodeList)
         else:
@@ -121,10 +145,11 @@ def runAlgorithm():
             nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
                                 data.recievingPort.id)
             print("Node list length: " + str(len(nodeList)))
-            
+
+        print(type(nodeList[1]))
         formAnimation(nodeList)
         data.runAnimation = True
-            
+
     else:
         text("Please select both a sending router and a receiving router",
              theme.boldFont, int(0.015 * width),
@@ -146,11 +171,11 @@ def randomizeNetwork():
     clearData()
     network.randomizeNetwork(random.randint(2, 12))
     numNodes = len(network.nodes)
-    radius = height*0.2
-    num = math.pi*2/numNodes
+    radius = height * 0.2
+    num = math.pi * 2 / numNodes
     for i in range(numNodes):
-        x = math.cos(num*i)*radius+(width/2)
-        y = math.sin(num*i)*radius+(height/2)
+        x = math.cos(num * i) * radius + (width / 2)
+        y = math.sin(num * i) * radius + (height / 2)
         routers.append(RouterIcon(x, y, network.nodes[i]))
     for link in network.links:
         startID = link[0]
@@ -395,13 +420,14 @@ def animate():
         stage = int(time.time()) % length
         if stage == 0:
             animationRouters[len(animationRouters) -
-                            1].setColour("buttonColourDark")
+                             1].setColour("buttonColourDark")
             animationConnections[-1].turnBlack()
         if stage % 2 == 0:
             animationRouters[int(stage / 2)].setColour("buttonTextColour")
             animationConnections[(int(stage / 2)) - 1].turnBlack()
         else:
-            animationRouters[int((stage - 1) / 2)].setColour("buttonColourDark")
+            animationRouters[int(
+                (stage - 1) / 2)].setColour("buttonColourDark")
             animationConnections[int(
                 (stage - 1) / 2)].setColour("buttonTextColour")
 
@@ -626,7 +652,7 @@ data = Data()
 mouse = Mouse()
 while True:
     #event = pygame.event.wait() <- seems to cause the animation to bug
-    
+
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -646,9 +672,9 @@ while True:
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
             data.stateSetupDone = False
             objects.clear()
-    
+
     mouse.update()
-    
+
     draw()
     pygame.display.update()
     #fpsClock.tick(fps)
