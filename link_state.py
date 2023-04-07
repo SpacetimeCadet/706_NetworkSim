@@ -90,7 +90,7 @@ def Dijsktra(graph1, src, dest):
             
             
 
-g = Dijsktra(networkGraph1, 1, 5) #should return [1, 2, 4, 5]
-print(g)
+#g = Dijsktra(networkGraph1, 1, 5) #should return [1, 2, 4, 5]
+#print(g)
 #Dijsktra(networkGraph1,'C', 'A') #should return [2, 0]
 #Dijsktra(networkGraph2, 0, 4)
