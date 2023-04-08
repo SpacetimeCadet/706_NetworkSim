@@ -2,64 +2,57 @@ import os
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
-import pygame, sys, string, math, theme, datetime, random
-from pygame.locals import QUIT
+import pygame, sys, math, theme, datetime, random, time
 from button import Button
+from data import Data
 from textBox import TextBox
+from pygame.locals import QUIT
 from network import Network
-import random
+from distance_vector import dist_vec
+from dijsktra3 import Dijsktra
 
 pygame.init()
 
 #Screen setup
-#original size: Height = 1120, Width = 2025
-
 height = 600
 width = 1200
 
 screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 pygame.display.set_caption('Connection Model')
 
-objects = []
+buttons = []
 routers = []
 connections = []
 network = Network([], [])  #empty lists create empty Network
+animationRouters = []
+animationConnections = []
 
 #style: 1 = teal theme, network background, 2 = blue theme, spiral background
 theme.style = 1
 currentStyle = theme.currentTheme()
 
-
-### DATA STRUCTURES ###
-class Data():
-    #keep track of central variables
-    def __init__(self):
-        self.state = True
-        self.stateSetupDone = False
-        self.drawingRouter = False
-        self.drawingConnection = False
-        self.routerSelected = False
-        self.choosingConnectionWeight = False
-        self.routerA = 0
-        self.routerB = 0
-        self.weightTextBox = False
-
 class RouterIcon():
     #depicts router on drawing screen, tracks connections
     def __init__(self, x, y, id):
         self.surface = screen
-        self.color = currentStyle.get("buttonColourDark")
+        self.colour = currentStyle.get("buttonColourDark")
         self.center = (x, y)
         self.radius = 20
         self.id = id
         self.connections = []
+
+    def setCoordinates(self, x, y):
+        self.center = (x, y)
+
+    def setColour(self, colour):
+        self.colour = currentStyle.get(colour)
 
 
 class ConnectionIcon():
     #line between two router icons
     def __init__(self, x1, y1, x2, y2):
         self.surface = screen
-        self.color = (0, 0, 0)
+        self.colour = (0, 0, 0)
         self.start = (x1, y1)
         self.startRouter = getRouterAt(x1, y1)
         self.end = (x2, y2)
@@ -70,27 +63,104 @@ class ConnectionIcon():
         self.a = a
         self.b = b
 
+    def moveStart(self, x, y):
+        self.start = (x, y)
+
+    def moveEnd(self, x, y):
+        self.end = (x, y)
+
+    def setColour(self, colour):
+        self.colour = currentStyle.get(colour)
+
+    def turnBlack(self):
+        self.colour = (0, 0, 0)
+
 
 ### INTERFACE FUNCTIONALITY ###
 def selectSendPort():
-    print('Send pressed')
+    data.selectingSendingPort = True
 
 
 def selectAlgorithm():
-    print('Algorithm pressed')
+    data.toggleAlgorithm()
 
 
 def selectRecievePort():
-    print('Recieve pressed')
+    data.selectingRecievingPort = True
+
+
+def runAlgorithm():
+    if data.sendingPort != 0 and data.recievingPort != 0:
+        graph = network.toDictionary()
+        if data.selectedAlgorithm == "Dijsktra":
+            #placeholder for testing
+            graph2 = {
+                '1': {
+                    '2': 1,
+                    '3': 1
+                },
+                '2': {
+                    '1': 1,
+                    '3': 1,
+                    '4': 1
+                },
+                '3': {
+                    '1': 1,
+                    '2': 1,
+                    '5': 1
+                },
+                '4': {
+                    '2': 1,
+                    '5': 1,
+                    '6': 1
+                },
+                '5': {
+                    '3': 1,
+                    '4': 1
+                },
+                '6': {
+                    '4': 1
+                }
+            }
+            printDebug()
+            print("sending port: " + str(data.sendingPort.id))
+            print("recieving port: " + str(data.recievingPort.id))
+            stringList = Dijsktra(graph2, str(data.sendingPort.id),
+                                str(data.recievingPort.id))
+            nodeList = []
+            for node in stringList:
+                nodeList.append(int(node))            
+            print("nodeList length: " + str(len(nodeList)))
+            print(*nodeList)
+        else:
+            #Bellman-Ford gives a 2D array instead of a list of nodes
+            #nodeList = dist_vec(graph, str(data.sendingPort.id),
+            #                    str(data.recievingPort.id))
+            printDebug()
+            print("sending port: " + str(data.sendingPort.id))
+            print("recieving port: " + str(data.recievingPort.id))
+            nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
+                                data.recievingPort.id)
+            print("Node list length: " + str(len(nodeList)))
+
+        print(type(nodeList[1]))
+        formAnimation(nodeList)
+        data.runAnimation = True
+
+    else:
+        text("Please select both a sending router and a receiving router",
+             theme.boldFont, int(0.015 * width),
+             currentStyle.get("buttonTextColour"), width * 0.04, height * 0.86)
 
 
 def addRouter():
-    data.drawingRouter = True
-    data.drawingConnection = False
+    if not data.choosingConnectionWeight:
+        data.drawingRouter = True
+        data.drawingConnection = False
 
 
 def addConnection():
-    if len(network.nodes) > 1:
+    if len(network.nodes) > 1 and not data.choosingConnectionWeight:
         data.drawingConnection = True
         data.drawingRouter = False
 
@@ -98,13 +168,13 @@ def addConnection():
 def randomizeNetwork():
     clearData()
     network.randomizeNetwork(random.randint(2, 12))
-    for node in network.nodes:
-        randx = random.randint(width * 0.1, width * 0.9)
-        randy = random.randint(height * 0.30, height * 0.70)
-        while getRouterAt(randx, randy) != False:
-            randx = random.randint(width * 0.1, width * 0.9)
-            randy = random.randint(height * 0.30, height * 0.70)
-        routers.append(RouterIcon(randx, randy, node))
+    numNodes = len(network.nodes)
+    radius = height * 0.2
+    num = math.pi * 2 / numNodes
+    for i in range(numNodes):
+        x = math.cos(num * i) * radius + (width / 2)
+        y = math.sin(num * i) * radius + (height / 2)
+        routers.append(RouterIcon(x, y, network.nodes[i]))
     for link in network.links:
         startID = link[0]
         endID = link[1]
@@ -122,6 +192,7 @@ def clearData():
     network.clear()
     connections.clear()
     routers.clear()
+    data.refresh()
 
 
 def printDebug():
@@ -139,11 +210,6 @@ def onDrawingArea(x, y):
         return True
     return False
 
-
-def getClickedRouter():
-    mx, my = pygame.mouse.get_pos()
-    return getRouterAt(mx, my)
-
 def getRouterAt(x, y):
     for router in routers:
         if x > router.center[0] - router.radius and x < router.center[
@@ -151,11 +217,18 @@ def getRouterAt(x, y):
             if y > router.center[1] - router.radius and y < router.center[
                     1] + router.radius:
                 return router
-    return False
 
 
 def isClickingRouter():
-    return getClickedRouter != False
+    mx, my = pygame.mouse.get_pos()
+    for router in routers:
+        if mx > router.center[0] - router.radius and mx < router.center[
+                0] + router.radius:
+            if my > router.center[1] - router.radius and my < router.center[
+                    1] + router.radius:
+                return True
+    return False
+
 
 def disconnectRouters(routerA, routerB):
     i = 0
@@ -230,16 +303,150 @@ def removeAllConnectionsOfRouter(routerA):
     routerA.connections.clear()
 
 
+def removeRouter(r):
+    removeAllConnectionsOfRouter(r)
+    i = 0
+    for node in routers:
+        if node == r:
+            network.removeNode(r.id)
+            routers.pop(i)
+            if data.sendingPort == r:
+                data.sendingPort = 0
+            if data.recievingPort == r:
+                data.recievingPort = 0
+            break
+        i = i + 1
+
+
+def drawNetwork():
+    #draw all lines
+    for connection in connections:
+        pygame.draw.line(screen, connection.colour, connection.start,
+                         connection.end, 2)
+        ### TODO: use Network function:
+        #                   getWeight(connection.a, connection.b)
+        text(str(connection.weight), theme.lightFont, 15,
+             currentStyle.get("buttonColourLight"),
+             (connection.start[0] + connection.end[0]) / 2,
+             (connection.start[1] + connection.end[1]) / 2)
+
+    #draw all routers
+    i = 0
+    for router in routers:
+        pygame.draw.circle(router.surface, router.colour, router.center,
+                           router.radius)
+        text(str(router.id), theme.lightFont, 15,
+             currentStyle.get("titleColour"), router.center[0] - 5,
+             router.center[1] - 5)
+        i = i + 1
+
+    #draw unfinished connection line
+    if data.drawingConnection and data.routerSelected and data.routerA != 0:
+        pygame.draw.line(screen, (100, 100, 100), data.routerA.center,
+                         pygame.mouse.get_pos())
+        
+    if data.choosingConnectionWeight:
+        pygame.draw.line(screen, (0, 0, 0), data.routerA.center, data.routerB.center,
+                         2)
+        if data.weightTextBox == False:
+            data.weightTextBox = TextBox((data.routerA.center[0] + data.routerB.center[0]) // 2,
+                                            (data.routerA.center[1] + data.routerB.center[1]) // 2,
+                                            40, 30, 20)
+            
+        data.weightTextBox.process()
+
+
+
+def centreNetwork():
+    #aesthetic method to move the network to the centre of the screen
+    farthestLeft = width
+    farthestRight = 0
+    lowest = height
+    highest = 0
+    for router in routers:
+        if router.center[0] < farthestLeft:
+            farthestLeft = router.center[0]
+        if router.center[0] > farthestRight:
+            farthestRight = router.center[0]
+        if router.center[1] < lowest:
+            lowest = router.center[1]
+        if router.center[1] > highest:
+            highest = router.center[1]
+    screenCentreX = width / 2
+    screenCentreY = height / 2
+    xOffset = (farthestRight + farthestLeft) / 2 - screenCentreX
+    yOffset = (highest + lowest) / 2 - screenCentreY
+    for router in routers:
+        router.setCoordinates(router.center[0] - xOffset,
+                              router.center[1] - yOffset)
+
+    for connection in connections:
+        connection.moveStart(connection.start[0] - xOffset,
+                             connection.start[1] - yOffset)
+        connection.moveEnd(connection.end[0] - xOffset,
+                           connection.end[1] - yOffset)
+
+
 ### STATES ###
+
+
+def formAnimation(nodeIDs):
+    #turns list of node id's into an animation
+    #for some reason, thinks nodeIDs length == 0
+    print("length of nodeIDs: " + str(len(nodeIDs)))
+    animationRouters.clear()
+    animationConnections.clear()
+    for nodeID in nodeIDs:
+        for router in routers:
+            if router.id == nodeID:
+                animationRouters.append(router)
+                break
+
+    for i in range(1, len(animationRouters)):
+        for connection in connections:
+            if connection.start == animationRouters[
+                    i -
+                    1].center or connection.end == animationRouters[i -
+                                                                    1].center:
+                if connection.start == animationRouters[
+                        i].center or connection.end == animationRouters[
+                            i].center:
+                    animationConnections.append(connection)
+                    break
+
+
+def animate():
+    #run animation with 1s per stage
+    #at each stage, light up the next step, darken the last
+    length = len(animationConnections) + len(animationRouters)
+    if length > 1:
+        stage = int(time.time()) % length
+        if stage == 0:
+            animationRouters[len(animationRouters) -
+                             1].setColour("buttonColourDark")
+            animationConnections[-1].turnBlack()
+        if stage % 2 == 0:
+            animationRouters[int(stage / 2)].setColour("buttonTextColour")
+            animationConnections[(int(stage / 2)) - 1].turnBlack()
+        else:
+            animationRouters[int(
+                (stage - 1) / 2)].setColour("buttonColourDark")
+            animationConnections[int(
+                (stage - 1) / 2)].setColour("buttonTextColour")
+
+
 def toggleState():
-    data.state = (not data.state)
-    data.stateSetupDone = False
-    objects.clear()
-    data.drawingRouter = False
-    data.drawingConnection = False
-    data.routerSelected = False
-    data.routerA = 0
-    data.routerB = 0
+    if not data.choosingConnectionWeight:
+        #add check for a connected network when switching from setup to trace
+        #send drawn graph to network
+        data.state = (not data.state)
+        data.stateSetupDone = False
+        buttons.clear()
+        data.drawingRouter = False
+        data.drawingConnection = False
+        data.routerSelected = False
+        data.routerA = 0
+        data.routerB = 0
 
 
 def finalizeNewConnection(connWeight):
@@ -259,6 +466,7 @@ def finalizeNewConnection(connWeight):
     else:
         network.addLink([data.routerB.id, data.routerA.id, connWeight])
     data.choosingConnectionWeight = False
+    data.routerSelected = False
     data.weightTextBox = False
 
 def setupState():
@@ -266,7 +474,7 @@ def setupState():
     #Start by adding buttons
     if not data.stateSetupDone:
         fontSize = int(width * 0.013)
-        objects.extend([
+        buttons.extend([
             Button(width * 0.04, height * 0.18, width * 0.12, height * 0.05,
                    fontSize, 'ADD ROUTER', addRouter),
             Button(width * 0.19, height * 0.18, width * 0.13, height * 0.05,
@@ -286,47 +494,6 @@ def setupState():
     pygame.draw.rect(screen, (255, 255, 255),
                      (width * 0.04, height * 0.25, width * 0.92, height * 0.5))
 
-    if pygame.mouse.get_pressed()[0]:
-        #add new router
-        if data.drawingRouter:
-            mx, my = pygame.mouse.get_pos()
-            if onDrawingArea(mx, my):
-                ### ADD ROUTER ###
-                routers.append(RouterIcon(mx, my, network.assignNode()))
-                network.addNode(network.assignNode())
-                data.drawingRouter = False
-        #add new connection
-        if data.drawingConnection:
-            if not data.routerSelected:
-                data.routerA = getClickedRouter()
-                if (data.routerA != False):
-                    data.routerSelected = True
-            elif data.routerSelected:
-                data.routerB = getClickedRouter()
-                if (data.routerB != False):
-                    data.drawingConnection = False
-                    data.choosingConnectionWeight = True 
-            else:
-                data.drawingConnection = False
-                data.routerSelected = False
-
-    #deletion
-    if pygame.mouse.get_pressed()[2]:
-        mx, my = pygame.mouse.get_pos()
-        ### REMOVE CONNECTION ###
-        removeConnectionAtPoint(mx, my)
-        r = getClickedRouter()
-        if r != False:
-            removeAllConnectionsOfRouter(r)
-            i = 0
-            for node in routers:
-                if node == r:
-                    ### REMOVE ROUTER ###
-                    network.removeNode(r.id)
-                    routers.pop(i)
-                    break
-                i = i + 1
-
     #Tell user if they're drawing router/connection, otherwise display default text
     if data.drawingRouter:
         text("DRAWING ROUTER - click anywhere", theme.medFont,
@@ -337,66 +504,67 @@ def setupState():
              theme.medFont, int(0.015 * width),
              currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     elif data.choosingConnectionWeight:
-        text("type in connection weight (0-100 allowed), then press enter to confirm",
+        text("type in connection weight (0-100 allowed), then press enter to confirm. Press escape to cancel new connection.",
              theme.medFont, int(0.015 * width),
              currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     else:
         text("hint: right-click to remove a router/connection", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
-
-    #draw all lines
-    for connection in connections:
-        pygame.draw.line(screen, (0, 0, 0), connection.start, connection.end,
-                         2)
-        ### TODO: use Network function:
-        #                   getWeight(connection.a, connection.b)
-        text(str(connection.weight), theme.lightFont, 15,
-             currentStyle.get("buttonColourLight"),
-             (connection.start[0] + connection.end[0]) / 2,
-             (connection.start[1] + connection.end[1]) / 2)
-
-    #draw all routers
-    i = 0
-    for router in routers:
-        pygame.draw.circle(router.surface, router.color, router.center,
-                           router.radius)
-        text(str(router.id), theme.lightFont, 15,
-             currentStyle.get("titleColour"), router.center[0] - 5,
-             router.center[1] - 5)
-        i = i + 1
-
-    #draw unfinished connection line
-    if data.drawingConnection and data.routerSelected:
-        pygame.draw.line(screen, (100, 100, 100), data.routerA.center,
-                         pygame.mouse.get_pos())
-    
-    if data.choosingConnectionWeight:
-        pygame.draw.line(screen, (0, 0, 0), data.routerA.center, data.routerB.center,
-                         2)
-        if data.weightTextBox == False:
-            data.weightTextBox = TextBox((data.routerA.center[0] + data.routerB.center[0]) // 2,
-                                            (data.routerA.center[1] + data.routerB.center[1]) // 2,
-                                            40, 30, 20)
-            
-        data.weightTextBox.process()
-
+    drawNetwork()
 
 def traceState():
     #main state, algoritms performed on router data, state=False
     if not data.stateSetupDone:
         fontSize = int(width * 0.013)
-        objects.extend([
+        buttons.extend([
             Button(width * 0.04, height * 0.18, width * 0.12, height * 0.05,
                    fontSize, 'SENDING PORT', selectSendPort),
-            Button(width * 0.19, height * 0.18, width * 0.12, height * 0.05,
-                   fontSize, 'ALGORITHM', selectAlgorithm),
-            Button(width * 0.34, height * 0.18, width * 0.12, height * 0.05,
+            Button(width * 0.19, height * 0.18, width * 0.14, height * 0.05,
+                   fontSize, 'TOGGLE ALGORITHM', selectAlgorithm),
+            Button(width * 0.36, height * 0.18, width * 0.12, height * 0.05,
                    fontSize, 'RECIEVING PORT', selectRecievePort),
-            Button(width * 0.4, height * 0.8, width * 0.2, height * 0.05,
-                   fontSize, 'CHANGE ROUTER DATA', toggleState)
+            Button(width * 0.51, height * 0.18, width * 0.2, height * 0.05,
+                   fontSize, 'CHANGE ROUTER DATA', toggleState),
+            Button(width * 0.6, height * 0.8, width * 0.2, height * 0.05,
+                   fontSize, 'RUN ALGORITHM', runAlgorithm)
         ])
+        centreNetwork()
         data.stateSetupDone = True
+
+    #drawing panel
+    pygame.draw.rect(screen, (255, 255, 255),
+                     (width * 0.04, height * 0.25, width * 0.92, height * 0.5))
+
+    #display selected ports, algorithm
+    if data.sendingPort == 0:
+        sendID = "not selected"
+    else:
+        sendID = str(data.sendingPort.id)
+    if data.recievingPort == 0:
+        recieveID = "not selected"
+    else:
+        recieveID = str(data.recievingPort.id)
+    text("Sending port: " + sendID, theme.medFont, int(0.015 * width),
+         currentStyle.get("buttonTextColour"), width * 0.04, height * 0.77)
+    text("Recieving port: " + recieveID, theme.medFont, int(0.015 * width),
+         currentStyle.get("buttonTextColour"), width * 0.04, height * 0.8)
+    text("Algorithm: " + data.selectedAlgorithm, theme.medFont,
+         int(0.015 * width), currentStyle.get("buttonTextColour"),
+         width * 0.04, height * 0.83)
+    if data.selectingSendingPort:
+        text("SELECTING SENDING PORT - click on a router", theme.medFont,
+             int(0.015 * width), currentStyle.get("buttonColourDark"),
+             width * 0.04, height * 0.25)
+    if data.selectingRecievingPort:
+        text("SELECTING RECIEVING PORT - click on a router", theme.medFont,
+             int(0.015 * width), currentStyle.get("buttonColourDark"),
+             width * 0.04, height * 0.25)
+    
+    if data.runAnimation:
+        animate()
+
+    drawNetwork()
 
 
 def draw():
@@ -413,7 +581,7 @@ def draw():
     else:
         traceState()
 
-    for object in objects:
+    for object in buttons:
         object.process()
 
 
@@ -431,10 +599,62 @@ def centreText(words, font, size, colour, y):
     text_rect = textA.get_rect(center=(width / 2, y))
     screen.blit(textA, text_rect)
 
+def findClickedButton():
+    for button in buttons:
+        if button.mouseHover:
+            button.onclickFunction()
+            return True
+    return False
+
+def handleSetupLDown(mx, my):
+        #add new router
+    if data.drawingRouter:
+        routers.append(RouterIcon(mx, my, network.assignNode()))
+        network.addNode(network.assignNode())
+        data.drawingRouter = False
+    #add new connection
+    if data.drawingConnection:
+        if not data.routerSelected and isClickingRouter():
+            data.routerA = getRouterAt(mx,my)
+            data.routerSelected = True
+        elif data.routerSelected and isClickingRouter():
+            data.routerB = getRouterAt(mx,my)
+            if (data.routerB != 0):
+                data.drawingConnection = False
+                data.choosingConnectionWeight = True 
+        else:
+            data.drawingConnection = False
+            data.routerSelected = False
+
+def handleTraceLDown(mx, my):
+    if data.selectingSendingPort:
+        if isClickingRouter():
+            #if a sending port has already been selected, change it back to a regular router
+            if data.sendingPort != 0:
+                data.sendingPort.setColour("buttonColourDark")
+            #sending port cannot be the recieving port
+            if data.recievingPort == getRouterAt(mx, my):
+                data.recievingPort = 0
+            data.sendingPort = getRouterAt(mx, my)
+            data.sendingPort.setColour("buttonTextColour")
+        data.selectingSendingPort = False
+    elif data.selectingRecievingPort:
+        if isClickingRouter():
+            #if a sending port has already been selected, change it back to a regular router
+            if data.recievingPort != 0:
+                data.recievingPort.setColour("buttonColourDark")
+            #recieving port cannot be the sending port
+            if data.sendingPort == getRouterAt(mx, my):
+                data.sendingPort = 0
+            data.recievingPort = getRouterAt(mx, my)
+            data.recievingPort.setColour("buttonTextColour")
+        data.selectingRecievingPort = False
+
 ### GAME LOOP ###
 data = Data()
+
 while True:
-    for event in [pygame.event.wait()]+pygame.event.get():
+    for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
@@ -451,20 +671,35 @@ while True:
                 width = 2 * height
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
             data.stateSetupDone = False
-            objects.clear()
+            buttons.clear()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:       #left click
+                if findClickedButton():                         #try regardless of state. Advance to next event if true.
+                    continue
+                mx, my = event.pos      #mouse position
+                if data.state and onDrawingArea(mx, my):        #case: setup state
+                    handleSetupLDown(mx, my)
+                elif not data.state:                            #case: trace state
+                    handleTraceLDown(mx, my)
+            elif event.button == 3 and data.state:     #right click only used in setup state
+                mx, my = event.pos
+                removeConnectionAtPoint(mx, my)
+                if isClickingRouter():
+                    r = getRouterAt(mx, my)
+                    removeRouter(r)
         if event.type == pygame.KEYDOWN and not data.weightTextBox == False:
             if event.key == pygame.K_RETURN:
-                validInput = data.weightTextBox.validateText()
-                if validInput != False:
-                    finalizeNewConnection(validInput)
+                if data.weightTextBox.validateText():
+                    finalizeNewConnection(int(data.weightTextBox.text))
             elif event.key == pygame.K_BACKSPACE:
                 data.weightTextBox.backSpace()
-                print("backd: " + data.weightTextBox.text)
+            elif event.key == pygame.K_ESCAPE:          #cancel new connection
+                data.weightTextBox = False
+                data.choosingConnectionWeight = False
+                data.routerSelected = False
             else:
                 data.weightTextBox.appendChar(event.unicode)
-                print("added: " + data.weightTextBox.text)
-            
-
+        
     draw()
     pygame.display.update()
     #fpsClock.tick(fps)

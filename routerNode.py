@@ -1,7 +1,7 @@
 #this file defines the routerNode class
 
 class routerNode:
-    def __init__(self):
+    def __init__(self, name):
         """
         () -> object with set attributes
         
@@ -13,9 +13,14 @@ class routerNode:
         for pred.
         
         """
+        self.name = name
         self.cost = float('inf')
         self.pred = []
         
+    #how the object will print:
+    def __str__(self):
+        return f"{self.name}: cost: {self.cost}, pred: {self.pred}" 
+
         
     def updateCost(self, givenCost):
         """
@@ -41,3 +46,4 @@ class routerNode:
         """
         return self.pred
        
+   

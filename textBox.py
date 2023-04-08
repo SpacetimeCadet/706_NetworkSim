@@ -1,4 +1,3 @@
-#coolcool
 import pygame
 import theme
 pygame.init()
@@ -42,6 +41,6 @@ class TextBox():
             self.text = self.text[:-1]
     
     def validateText(self):
-        if len(self.text) > 0 and self.text.isnumeric and int(self.text) <= weightLimit:
-            return int(self.text)
+        if self.text.isnumeric() and int(self.text) <= weightLimit: 
+            return True
         return False
