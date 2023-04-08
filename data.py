@@ -6,6 +6,7 @@ class Data():
         self.drawingRouter = False
         self.drawingConnection = False
         self.routerSelected = False
+        self.choosingConnectionWeight = False
         self.routerA = 0
         self.routerB = 0
         self.selectingSendingPort = False
@@ -14,6 +15,7 @@ class Data():
         self.recievingPort = 0
         self.selectedAlgorithm = "Dijsktra"
         self.runAnimation = False
+        self.weightTextBox = False
 
     def toggleAlgorithm(self):
         if self.selectedAlgorithm == "Dijsktra":
@@ -27,6 +29,7 @@ class Data():
         self.drawingRouter = False
         self.drawingConnection = False
         self.routerSelected = False
+        self.choosingConnectionWeight = False
         self.routerA = 0
         self.routerB = 0
         self.selectingSendingPort = False
@@ -34,3 +37,4 @@ class Data():
         self.selectingRecievingPort = False
         self.recievingPort = 0
         self.runAnimation = False
+        self.weightTextBox = False
