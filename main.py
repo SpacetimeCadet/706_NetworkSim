@@ -3,8 +3,9 @@ import os
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
 import pygame, sys, string, math, theme, datetime, random
-from button import Button
 from pygame.locals import QUIT
+from button import Button
+from textBox import TextBox
 from network import Network
 import random
 
@@ -38,9 +39,10 @@ class Data():
         self.drawingRouter = False
         self.drawingConnection = False
         self.routerSelected = False
+        self.choosingConnectionWeight = False
         self.routerA = 0
         self.routerB = 0
-
+        self.weightTextBox = False
 
 class RouterIcon():
     #depicts router on drawing screen, tracks connections
@@ -240,6 +242,25 @@ def toggleState():
     data.routerB = 0
 
 
+def finalizeNewConnection(connWeight):
+    conIcon = ConnectionIcon(data.routerA.center[0],
+                            data.routerA.center[1],
+                            data.routerB.center[0],
+                            data.routerB.center[1])
+    conIcon.weight = connWeight
+    connections.append(conIcon)
+    conIcon.addIDs(data.routerA.id, data.routerB.id)
+    ### ADD CONNECTIONS ###
+    data.routerA.connections.append(data.routerB)
+    data.routerB.connections.append(data.routerA)
+    
+    if data.routerA.id < data.routerB.id:
+        network.addLink([data.routerA.id, data.routerB.id, connWeight])
+    else:
+        network.addLink([data.routerB.id, data.routerA.id, connWeight])
+    data.choosingConnectionWeight = False
+    data.weightTextBox = False
+
 def setupState():
     #get user input on routers, state=True
     #Start by adding buttons
@@ -283,23 +304,8 @@ def setupState():
             elif data.routerSelected:
                 data.routerB = getClickedRouter()
                 if (data.routerB != False):
-                    conIcon = ConnectionIcon(data.routerA.center[0],
-                                            data.routerA.center[1],
-                                            data.routerB.center[0],
-                                            data.routerB.center[1])
-                    connections.append(conIcon)
-                    conIcon.addIDs(data.routerA.id, data.routerB.id)
-
-                    ### ADD CONNECTIONS ###
-                    data.routerA.connections.append(data.routerB)
-                    data.routerB.connections.append(data.routerA)
-                    weight = 1  #TODO: make weight dynamic
-                    if data.routerA.id < data.routerB.id:
-                        network.addLink([data.routerA.id, data.routerB.id, weight])
-                    else:
-                        network.addLink([data.routerB.id, data.routerA.id, weight])
                     data.drawingConnection = False
-                    data.routerSelected = False
+                    data.choosingConnectionWeight = True 
             else:
                 data.drawingConnection = False
                 data.routerSelected = False
@@ -328,6 +334,10 @@ def setupState():
              width * 0.04, height * 0.25)
     elif data.drawingConnection:
         text("DRAWING CONNECTION - click the source then the destination",
+             theme.medFont, int(0.015 * width),
+             currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
+    elif data.choosingConnectionWeight:
+        text("type in connection weight (0-100 allowed), then press enter to confirm",
              theme.medFont, int(0.015 * width),
              currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     else:
@@ -360,6 +370,16 @@ def setupState():
     if data.drawingConnection and data.routerSelected:
         pygame.draw.line(screen, (100, 100, 100), data.routerA.center,
                          pygame.mouse.get_pos())
+    
+    if data.choosingConnectionWeight:
+        pygame.draw.line(screen, (0, 0, 0), data.routerA.center, data.routerB.center,
+                         2)
+        if data.weightTextBox == False:
+            data.weightTextBox = TextBox((data.routerA.center[0] + data.routerB.center[0]) // 2,
+                                            (data.routerA.center[1] + data.routerB.center[1]) // 2,
+                                            40, 30, 20)
+            
+        data.weightTextBox.process()
 
 
 def traceState():
@@ -411,18 +431,15 @@ def centreText(words, font, size, colour, y):
     text_rect = textA.get_rect(center=(width / 2, y))
     screen.blit(textA, text_rect)
 
-
 ### GAME LOOP ###
 data = Data()
 while True:
-    event = pygame.event.wait()
-    for event in pygame.event.get():
+    for event in [pygame.event.wait()]+pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
         if event.type == pygame.VIDEORESIZE:
             # There's some code to add back window content here.
-
             if event.w < 600 or event.h < 300:
                 width = 600
                 height = 300
@@ -435,6 +452,18 @@ while True:
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
             data.stateSetupDone = False
             objects.clear()
+        if event.type == pygame.KEYDOWN and not data.weightTextBox == False:
+            if event.key == pygame.K_RETURN:
+                validInput = data.weightTextBox.validateText()
+                if validInput != False:
+                    finalizeNewConnection(validInput)
+            elif event.key == pygame.K_BACKSPACE:
+                data.weightTextBox.backSpace()
+                print("backd: " + data.weightTextBox.text)
+            else:
+                data.weightTextBox.appendChar(event.unicode)
+                print("added: " + data.weightTextBox.text)
+            
 
     draw()
     pygame.display.update()
