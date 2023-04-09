@@ -692,7 +692,7 @@ while True:
                     handleSetupLDown(mx, my)
                 elif not data.state:  #case: trace state
                     handleTraceLDown(mx, my)
-            elif event.button == 3 and data.state:  #right click only used in setup state
+            elif event.button == 3 and data.state and not data.choosingConnectionWeight:  #right click only used in setup state
                 mx, my = event.pos
                 removeConnectionAtPoint(mx, my)
                 if isClickingRouter():
