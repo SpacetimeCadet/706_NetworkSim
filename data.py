@@ -7,8 +7,10 @@ class Data():
         self.drawingConnection = False
         self.routerSelected = False
         self.choosingConnectionWeight = False
+        self.reassigningWeight = False
         self.routerA = 0
         self.routerB = 0
+        self.connectionA = 0
         self.selectingSendingPort = False
         self.sendingPort = 0
         self.selectingRecievingPort = False
@@ -17,6 +19,7 @@ class Data():
         self.runAnimation = False
         self.weightTextBox = False
         self.draggingRouter = False
+        self.connectionA = 0
         self.stepByStepWeight = [0]
 
     def toggleAlgorithm(self):
@@ -32,6 +35,7 @@ class Data():
         self.drawingConnection = False
         self.routerSelected = False
         self.choosingConnectionWeight = False
+        self.reassigningWeight = False
         self.routerA = 0
         self.routerB = 0
         self.selectingSendingPort = False

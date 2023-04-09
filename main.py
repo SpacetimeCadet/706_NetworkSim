@@ -203,6 +203,19 @@ def disconnectRouters(routerA, routerB):
             routerB.connections.pop(j)
         j = j + 1
 
+def getConnectionAt(x, y):
+    i = -1
+    for connection in connections:
+        #only check connections that are in the same "hit box" rectangle as the point
+        i = i + 1
+        if (x < connection.start[0]
+                and x > connection.end[0]) or (x > connection.start[0]
+                                               and x < connection.end[0]):
+            if (y < connection.start[1]
+                    and y > connection.end[1]) or (y > connection.start[1]
+                                                   and y < connection.end[1]):
+                return connection;
+    return False
 
 def removeConnectionAtPoint(x, y):
     flexibility = 0.01
@@ -307,9 +320,10 @@ def drawNetwork():
                          pygame.mouse.get_pos())
 
     if data.choosingConnectionWeight:
-        pygame.draw.line(screen, (0, 0, 0), data.routerA.center,
+        if not data.reassigningWeight:
+            pygame.draw.line(screen, (0, 0, 0), data.routerA.center,
                          data.routerB.center, 2)
-        if data.weightTextBox == False:
+        if data.weightTextBox is False:
             data.weightTextBox = TextBox(
                 (data.routerA.center[0] + data.routerB.center[0]) // 2,
                 (data.routerA.center[1] + data.routerB.center[1]) // 2, 40, 30,
@@ -433,8 +447,12 @@ def finalizeNewConnection(connWeight):
         network.addLink([data.routerB.id, data.routerA.id, connWeight])
     data.choosingConnectionWeight = False
     data.routerSelected = False
-    data.weightTextBox = False
+    data.refresh()
 
+def assignWeight(connWeight):
+    data.connectionA.weight = connWeight
+    network.setWeight(data.routerA.id, data.routerB.id, connWeight)
+    data.refresh()
 
 def setupState():
     #get user input on routers, state=True
@@ -472,7 +490,7 @@ def setupState():
              currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     elif data.choosingConnectionWeight:
         text(
-            "type in connection weight (0-100 allowed), then press enter to confirm. Press escape to cancel new connection.",
+            "type in connection weight (0-100 allowed), then press enter to confirm. Press escape to cancel",
             theme.medFont, int(0.015 * width),
             currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     else:
@@ -600,6 +618,14 @@ def handleSetupLDown(mx, my):
             data.routerSelected = False
     elif isClickingRouter():
         data.draggingRouter = getRouterAt(mx, my)
+    else:
+        conn = getConnectionAt(mx, my)
+        if not conn is False:
+            data.choosingConnectionWeight = True
+            data.reassigningWeight = True
+            data.routerA = conn.startRouter
+            data.routerB = conn.endRouter
+            data.connectionA = conn
 
 
 def handleTraceLDown(mx, my):
@@ -675,17 +701,20 @@ while True:
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 data.draggingRouter = False
-        if event.type == pygame.MOUSEMOTION and not data.draggingRouter == False:
+        if event.type == pygame.MOUSEMOTION and not data.draggingRouter is False:
             data.draggingRouter.center = event.pos
             for connection in connections:
                 if data.draggingRouter is connection.startRouter:
                     connection.start = data.draggingRouter.center
                 elif data.draggingRouter is connection.endRouter:
                     connection.end = data.draggingRouter.center
-        if event.type == pygame.KEYDOWN and not data.weightTextBox == False:
+        if event.type == pygame.KEYDOWN and not data.weightTextBox is False:
             if event.key == pygame.K_RETURN:
                 if data.weightTextBox.validateText():
-                    finalizeNewConnection(int(data.weightTextBox.text))
+                    if data.reassigningWeight:
+                        assignWeight(int(data.weightTextBox.text))
+                    else:
+                        finalizeNewConnection(int(data.weightTextBox.text))
             elif event.key == pygame.K_BACKSPACE:
                 data.weightTextBox.backSpace()
             elif event.key == pygame.K_ESCAPE:  #cancel new connection
