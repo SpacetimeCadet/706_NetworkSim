@@ -456,8 +456,6 @@ def finalizeNewConnection(connWeight):
         network.addLink([data.routerA.id, data.routerB.id, connWeight])
     else:
         network.addLink([data.routerB.id, data.routerA.id, connWeight])
-    data.choosingConnectionWeight = False
-    data.routerSelected = False
     data.refresh()
 
 def assignWeight(connWeight):
@@ -492,7 +490,7 @@ def setupState():
 
     #Tell user if they're drawing router/connection, otherwise display default text
     if data.drawingRouter:
-        text("DRAWING ROUTER - click anywhere", theme.medFont,
+        text("DRAWING ROUTERS - click anywhere. Escape to cancel", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
     elif data.drawingConnection:
@@ -611,7 +609,6 @@ def handleSetupLDown(mx, my):
     if data.drawingRouter:
         routers.append(RouterIcon(mx, my, network.assignNode()))
         network.addNode(network.assignNode())
-        data.drawingRouter = False
     #add new connection
     elif data.drawingConnection:
         if not data.routerSelected and isClickingRouter():
