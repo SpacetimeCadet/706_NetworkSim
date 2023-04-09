@@ -99,6 +99,8 @@ class Network():
         for i in self.links:
             if i[0] == nodeA and i[1] == nodeB:
                 l.append(i)
+            elif i[0] == nodeB and i[1] == nodeA:
+                l.append(i)
         if l == []:
             l = [0, 0, 0]
         return l
