@@ -415,6 +415,13 @@ def animate():
         text("Current total weight: " + str(data.stepByStepWeight[stage]),
              theme.medFont, int(0.015 * width),
              currentStyle.get("buttonColourLight"), width * 0.6, height * 0.25)
+        
+def stopAnimation():
+    for router in routers:
+            router.setColour("buttonColourDark")
+    for connection in connections:
+            connection.turnBlack()
+    data.runAnimation = False
 
 
 def toggleState():
@@ -424,11 +431,9 @@ def toggleState():
         data.state = (not data.state)
         data.stateSetupDone = False
         buttons.clear()
-        data.drawingRouter = False
-        data.drawingConnection = False
-        data.routerSelected = False
-        data.routerA = 0
-        data.routerB = 0
+        if data.runAnimation:
+            stopAnimation()
+        data.refresh()
 
 
 def finalizeNewConnection(connWeight):
@@ -692,7 +697,7 @@ while True:
                     handleSetupLDown(mx, my)
                 elif not data.state:  #case: trace state
                     handleTraceLDown(mx, my)
-            elif event.button == 3 and data.state and not data.choosingConnectionWeight:  #right click only used in setup state
+            elif event.button == 3 and data.state:  #right click only used in setup state
                 mx, my = event.pos
                 removeConnectionAtPoint(mx, my)
                 if isClickingRouter():
@@ -720,8 +725,6 @@ while True:
             elif event.key == pygame.K_ESCAPE:  #cancel new connection
                 data.weightTextBox = False
                 data.choosingConnectionWeight = False
-                data.reassigningWeight = False
-                data.drawingConnection = False
                 data.routerSelected = False
             else:
                 data.weightTextBox.appendChar(event.unicode)
