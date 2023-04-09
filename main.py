@@ -590,7 +590,7 @@ def handleSetupLDown(mx, my):
             data.routerSelected = True
         elif data.routerSelected and isClickingRouter():
             data.routerB = getRouterAt(mx, my)
-            if (data.routerB != 0):
+            if data.routerB != 0 and not data.routerB is data.routerA:
                 data.drawingConnection = False
                 data.choosingConnectionWeight = True
         else:
@@ -657,8 +657,7 @@ while True:
             buttons.clear()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  #left click
-                if findClickedButton(
-                ):  #try regardless of state. Advance to next event if true.
+                if findClickedButton():  #try regardless of state. Advance to next event if true.
                     continue
                 mx, my = event.pos  #mouse position
                 if data.state and onDrawingArea(mx, my):  #case: setup state
@@ -672,7 +671,8 @@ while True:
                     r = getRouterAt(mx, my)
                     removeRouter(r)
         if event.type == pygame.MOUSEBUTTONUP:
-            data.draggingRouter = False
+            if event.button == 1:
+                data.draggingRouter = False
         if event.type == pygame.MOUSEMOTION and not data.draggingRouter == False:
             data.draggingRouter.center = event.pos
             for connection in connections:
