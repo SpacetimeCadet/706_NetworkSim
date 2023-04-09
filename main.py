@@ -707,12 +707,14 @@ while True:
             if event.button == 1:
                 data.draggingRouter = False
         if event.type == pygame.MOUSEMOTION and not data.draggingRouter is False:
-            data.draggingRouter.center = event.pos
-            for connection in connections:
-                if data.draggingRouter is connection.startRouter:
-                    connection.start = data.draggingRouter.center
-                elif data.draggingRouter is connection.endRouter:
-                    connection.end = data.draggingRouter.center
+            mx, my = event.pos
+            if onDrawingArea(mx, my):
+                data.draggingRouter.center = event.pos
+                for connection in connections:
+                    if data.draggingRouter is connection.startRouter:
+                        connection.start = data.draggingRouter.center
+                    elif data.draggingRouter is connection.endRouter:
+                        connection.end = data.draggingRouter.center
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 data.weightTextBox = False
