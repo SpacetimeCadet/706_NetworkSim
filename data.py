@@ -29,7 +29,6 @@ class Data():
             self.selectedAlgorithm = "Dijsktra"
 
     def refresh(self):
-        self.state = True
         self.stateSetupDone = False
         self.drawingRouter = False
         self.drawingConnection = False

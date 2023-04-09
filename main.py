@@ -80,6 +80,9 @@ class ConnectionIcon():
 
 ### INTERFACE FUNCTIONALITY ###
 def selectSendPort():
+    if data.runAnimation:
+        stopAnimation()
+        data.refresh()
     data.selectingSendingPort = True
 
 
@@ -88,6 +91,9 @@ def selectAlgorithm():
 
 
 def selectRecievePort():
+    if data.runAnimation:
+        stopAnimation()
+        data.refresh()
     data.selectingRecievingPort = True
 
 
@@ -697,7 +703,8 @@ while True:
                     handleSetupLDown(mx, my)
                 elif not data.state:  #case: trace state
                     handleTraceLDown(mx, my)
-            elif event.button == 3 and data.state:  #right click only used in setup state
+            elif (event.button == 3 and data.state 
+                and not data.choosingConnectionWeight):  #right click only used in setup state
                 mx, my = event.pos
                 removeConnectionAtPoint(mx, my)
                 if isClickingRouter():
@@ -730,11 +737,7 @@ while True:
                 elif event.key == pygame.K_BACKSPACE:
                     data.weightTextBox.backSpace()
                 elif event.key == pygame.K_ESCAPE:  #cancel new connection
-                    data.weightTextBox = False
-                    data.choosingConnectionWeight = False
-                    data.reassigningWeight = False
-                    data.drawingConnection = False
-                    data.routerSelected = False
+                    data.refresh()
                 else:
                     data.weightTextBox.appendChar(event.unicode)
             
