@@ -720,6 +720,8 @@ while True:
             elif event.key == pygame.K_ESCAPE:  #cancel new connection
                 data.weightTextBox = False
                 data.choosingConnectionWeight = False
+                data.reassigningWeight = False
+                data.drawingConnection = False
                 data.routerSelected = False
             else:
                 data.weightTextBox.appendChar(event.unicode)
