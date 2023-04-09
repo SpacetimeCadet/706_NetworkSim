@@ -16,6 +16,7 @@ class Data():
         self.selectedAlgorithm = "Dijsktra"
         self.runAnimation = False
         self.weightTextBox = False
+        self.draggingRouter = False
 
     def toggleAlgorithm(self):
         if self.selectedAlgorithm == "Dijsktra":

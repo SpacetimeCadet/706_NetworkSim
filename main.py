@@ -613,7 +613,7 @@ def handleSetupLDown(mx, my):
         network.addNode(network.assignNode())
         data.drawingRouter = False
     #add new connection
-    if data.drawingConnection:
+    elif data.drawingConnection:
         if not data.routerSelected and isClickingRouter():
             data.routerA = getRouterAt(mx,my)
             data.routerSelected = True
@@ -625,6 +625,9 @@ def handleSetupLDown(mx, my):
         else:
             data.drawingConnection = False
             data.routerSelected = False
+    elif isClickingRouter():
+        data.draggingRouter = getRouterAt(mx, my)
+
 
 def handleTraceLDown(mx, my):
     if data.selectingSendingPort:
@@ -687,6 +690,15 @@ while True:
                 if isClickingRouter():
                     r = getRouterAt(mx, my)
                     removeRouter(r)
+        if event.type == pygame.MOUSEBUTTONUP:
+            data.draggingRouter = False
+        if event.type == pygame.MOUSEMOTION and not data.draggingRouter == False:
+            data.draggingRouter.center = event.pos
+            for connection in connections:
+                if data.draggingRouter is connection.startRouter:
+                    connection.start = data.draggingRouter.center
+                elif data.draggingRouter is connection.endRouter:
+                    connection.end = data.draggingRouter.center
         if event.type == pygame.KEYDOWN and not data.weightTextBox == False:
             if event.key == pygame.K_RETURN:
                 if data.weightTextBox.validateText():
