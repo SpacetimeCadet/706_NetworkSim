@@ -724,10 +724,8 @@ while True:
                         connection.end = data.draggingRouter.center
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                data.weightTextBox = False
-                data.choosingConnectionWeight = False
-                data.routerSelected = False
-            if not data.weightTextBox is False:
+                data.refresh()
+            elif not data.weightTextBox is False:
                 if event.key == pygame.K_RETURN:
                     if data.weightTextBox.validateText():
                         if data.reassigningWeight:
@@ -736,8 +734,6 @@ while True:
                             finalizeNewConnection(int(data.weightTextBox.text))
                 elif event.key == pygame.K_BACKSPACE:
                     data.weightTextBox.backSpace()
-                elif event.key == pygame.K_ESCAPE:  #cancel new connection
-                    data.refresh()
                 else:
                     data.weightTextBox.appendChar(event.unicode)
             
