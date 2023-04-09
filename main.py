@@ -590,9 +590,11 @@ def handleSetupLDown(mx, my):
             data.routerSelected = True
         elif data.routerSelected and isClickingRouter():
             data.routerB = getRouterAt(mx, my)
-            if data.routerB != 0 and not data.routerB is data.routerA:
-                data.drawingConnection = False
-                data.choosingConnectionWeight = True
+            if (data.routerB != 0 
+                and not data.routerB is data.routerA 
+                and not data.routerB in data.routerA.connections):
+                    data.drawingConnection = False
+                    data.choosingConnectionWeight = True
         else:
             data.drawingConnection = False
             data.routerSelected = False
