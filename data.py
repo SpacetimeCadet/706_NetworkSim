@@ -17,6 +17,7 @@ class Data():
         self.runAnimation = False
         self.weightTextBox = False
         self.draggingRouter = False
+        self.stepByStepWeight = [0]
 
     def toggleAlgorithm(self):
         if self.selectedAlgorithm == "Dijsktra":
@@ -39,3 +40,4 @@ class Data():
         self.recievingPort = 0
         self.runAnimation = False
         self.weightTextBox = False
+        self.stepByStepWeight = [0]
