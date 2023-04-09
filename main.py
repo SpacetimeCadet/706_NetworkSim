@@ -27,6 +27,7 @@ network = Network([], [])  #empty lists create empty Network
 animationRouters = []
 animationConnections = []
 
+
 #style: 1 = teal theme, network background, 2 = blue theme, spiral background
 theme.style = 1
 currentStyle = theme.currentTheme()
@@ -37,7 +38,7 @@ class RouterIcon():
         self.surface = screen
         self.colour = currentStyle.get("buttonColourDark")
         self.center = (x, y)
-        self.radius = 20
+        self.radius = 20.0
         self.id = id
         self.connections = []
 
@@ -663,6 +664,7 @@ while True:
             sys.exit()
         if event.type == pygame.VIDEORESIZE:
             # There's some code to add back window content here.
+            oldwidth = width
             if event.w < 600 or event.h < 300:
                 width = 600
                 height = 300
@@ -673,6 +675,13 @@ while True:
                 height = event.h
                 width = 2 * height
             screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+            windowScaleRatio = width / oldwidth
+            for router in routers:
+                router.radius *= windowScaleRatio
+                router.center = (router.center[0]*windowScaleRatio, router.center[1]*windowScaleRatio)
+            for connection in connections:
+                connection.start = connection.startRouter.center
+                connection.end = connection.endRouter.center
             data.stateSetupDone = False
             buttons.clear()
         if event.type == pygame.MOUSEBUTTONDOWN:
