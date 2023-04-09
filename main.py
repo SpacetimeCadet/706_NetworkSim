@@ -723,7 +723,7 @@ while True:
                     elif data.draggingRouter is connection.endRouter:
                         connection.end = data.draggingRouter.center
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+            if event.key == pygame.K_ESCAPE and data.state: #undo any in progess setup action
                 data.refresh()
             elif not data.weightTextBox is False:
                 if event.key == pygame.K_RETURN:
