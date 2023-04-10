@@ -60,11 +60,10 @@ def dist_vec(graph, source, destination):
         trace_list.append(destination)
         node_list.append(trace_list)
 
-    # description
+    # description of tracing
     for i in node_list:
-        description.append("Connected to nodes "+str(i)+" "+"to reach node "+dest) 
         ind = node_list.index(i)
-        description.append("Updated cost: "+str(node_cost[ind]))
+        description.append("Connected to nodes "+str(i)+" "+"to reach node "+dest+ "\n" +"Updated cost: "+str(node_cost[ind]))
 
     # detecting negative cycle
     # after (number of nodes - 1) iterations 
