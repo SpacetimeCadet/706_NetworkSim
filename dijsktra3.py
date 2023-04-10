@@ -32,6 +32,7 @@ def Dijsktra(graph, sourceV, destinationV):
     we need the source vertex to have the starting cost value as zero, unlike the rest of the nodes which we want their starting costs to be infinity. We have already set all nodes
     to have the default cost of infinity so we have to change that for the source node now
     """
+
     node_states[sourceV].updateCost(0)  #before the period is the OBJECT associated with the key sourceV in our node_Info dict and after the period is the fn call to change its cost value
     
     #now we will create a list to collect visited nodes that we have determined are in our final route

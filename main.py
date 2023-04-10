@@ -102,8 +102,8 @@ def runAlgorithm():
         graph = network.toDictionary()
         if data.selectedAlgorithm == "Dijsktra":
             #convert dijsktra's "list of string" output to required list of ints
-            stringList = Dijsktra(graph, str(data.sendingPort.id),
-                                  str(data.recievingPort.id))
+            stringList = Dijsktra(graph, data.sendingPort.id,
+                                  data.recievingPort.id)
             nodeList = []
             for node in stringList:
                 nodeList.append(int(node))
