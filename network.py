@@ -5,7 +5,7 @@ class Network():
         self.nodes = nodes # A list of numeric identifiers for the nodes of the network.
         self.links = links # A list of triples in the form [nodeSource, nodeDestination, Weight].
 
-
+    # test
     # this method clears the current network and randomly generates a network of the specified size (must be between 2-20 nodes)
     def randomizeNetwork(self, size):
             # Initialize Network and Verify Arguments
