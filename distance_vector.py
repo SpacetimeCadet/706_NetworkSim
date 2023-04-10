@@ -68,11 +68,11 @@ def dist_vec(graph, source, destination):
     # detecting negative cycle
     # after (number of nodes - 1) iterations 
     # if the cost of any nodes changes (lesser cost) then there is a negative cycle
-    for itr in graph_dict:
-        for neighbor in graph_dict[itr]:
-            if (node_data[itr]['cost'] + graph_dict[itr][neighbor] < node_data[neighbor]['cost'] and cost != inf):
-                print("Negative cycle detected") 
-                return
+#     for itr in graph_dict:
+#         for neighbor in graph_dict[itr]:
+#             if (node_data[itr]['cost'] + graph_dict[itr][neighbor] < node_data[neighbor]['cost'] and cost != inf):
+#                 print("Negative cycle detected") 
+#                 return
 
     least_cost = node_data[dest]['cost']
     #print("Least Cost: " ,least_cost)
@@ -86,13 +86,13 @@ def dist_vec(graph, source, destination):
 
     # returning the shortest path as a list
     # list is in a form of [source node, dest node, cost]
-    shortest_path = []
-    for itr in range(len(path_node)-1):
-        for i in graph:
-            for j in graph[i]:
-                if (i==path_node[itr] and j==path_node[itr+1]):
-                    shortest_path.append([i,j,graph[i][j]])
-                    break 
+#     shortest_path = []
+#     for itr in range(len(path_node)-1):
+#         for i in graph:
+#             for j in graph[i]:
+#                 if (i==path_node[itr] and j==path_node[itr+1]):
+#                     shortest_path.append([i,j,graph[i][j]])
+#                     break 
     #return shortest_path
     return node_list, description
 
