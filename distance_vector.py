@@ -8,6 +8,10 @@ def dist_vec(graph, source, destination):
     graph_dict = d.node_string(graph)
     src = str(source)
     dest = str(destination)
+    
+    node_list = []
+    node_cost = []
+    description = []
 
     '''dictionary of cost and predecessor in each node and 
        pred will give the path from source node A to pred node
@@ -45,6 +49,22 @@ def dist_vec(graph, source, destination):
       
         # print("Iteration:", str(i))    
         # pprint.pprint(node_data)
+        
+        # cost of each node in the iteraions
+        c = node_data[dest]['cost']
+        node_cost.append(c)
+
+        #detailed tracing for destination node
+        path_trace = node_data[dest]['pred']
+        trace_list = [eval(i) for i in path_trace]
+        trace_list.append(destination)
+        node_list.append(trace_list)
+
+    # description
+    for i in node_list:
+        description.append("Connected to nodes "+str(i)+" "+"to reach node "+dest) 
+        ind = node_list.index(i)
+        description.append("Updated cost: "+str(node_cost[ind]))
 
     # detecting negative cycle
     # after (number of nodes - 1) iterations 
@@ -75,7 +95,7 @@ def dist_vec(graph, source, destination):
                     shortest_path.append([i,j,graph[i][j]])
                     break 
     #return shortest_path
-    return path_node
+    return node_list, description
 
 # if __name__ == "__main__":
 
