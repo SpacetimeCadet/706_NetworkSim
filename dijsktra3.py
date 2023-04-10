@@ -22,6 +22,7 @@ def Dijsktra(graph, sourceV, destinationV):
     """
     
     infinity = float('inf') #storing the math concept infinity into a variable called 'infinity'
+    trace_nodes = []
     trace_text = []
     trace_text.append("Starting node is: " + str(sourceV) + "\n")
     
@@ -62,6 +63,7 @@ def Dijsktra(graph, sourceV, destinationV):
                         node_states[j].updateCost(cost)
                         new_pred = node_states[next_source].getPred() + [next_source] #adding this line so that the next line below is clearer to read. Basically, we want to think about the node we are going to next and figure out what its sortest path is. Its shortest past, will be the shortest path to the node that comes before it (which is our current source node called, next_source) plus we need to add that source node. We use [] around the last term of that line because next_source is just a node but we need it be a list so that we can concatenate it/add it to that shortest path list for that previous node. 
                         node_states[j].updatePred(new_pred)
+                    trace_nodes.append(node_states[j].getPred())    
                     trace_text.append("neighbouring node " + str(node_states[j]) + "\n") #for debugging
                         
                     heappush(min_heap, (node_states[j].getCost(), j)) #NOTE: heappush() pushes an element into the heap BUT importantly ensures the min heap property is maintained (by default)! We push it 2 values: 1. the cost of the neighbouring node (all neighbours inside the line 53 for loop) and 2. the name of the neighbouring node
@@ -71,7 +73,7 @@ def Dijsktra(graph, sourceV, destinationV):
         if len(min_heap) == 0 and next_source != destinationV:
             next_source = visited[-2]#return to the previous node (which is not our current source node) in our visisted list. visited[-1] would make the current node our next_source node, which is NOT what we want. we would then get stuck in an infinite loop of visiting the same node.
             visited.remove(visited[-2])
-            trace_text.append("We are backtracking to node ", str(next_source) + "\n") #for debugging
+            trace_text.append("We are backtracking to node " + str(next_source) + "\n") #for debugging
         else:         
         ##---- above code added for that scenario ending       
             next_source = min_heap[0][1] #now outside of the loop visiting all neighbour nodes (line 55), we want to reassign our current source node (aka next_source) to be the neighbouring node with the least cost, which will be the root node of the min heap data structure. 
@@ -79,8 +81,7 @@ def Dijsktra(graph, sourceV, destinationV):
                 
     trace_text.append("The shorest path from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getPred() + [destinationV]) + "\n")
     trace_text.append("The distance from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getCost()) + "\n")
-    print(trace_text)
-    return(node_states[destinationV].getPred() + [destinationV])
+    return(trace_nodes, node_states[destinationV].getPred() + [destinationV], trace_text)
             
             
             

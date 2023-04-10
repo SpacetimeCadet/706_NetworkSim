@@ -104,6 +104,7 @@ def runAlgorithm():
             #convert dijsktra's "list of string" output to required list of ints
             stringList = Dijsktra(graph, data.sendingPort.id,
                                   data.recievingPort.id)
+            print(stringList)
             nodeList = []
             for node in stringList:
                 nodeList.append(int(node))
