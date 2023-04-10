@@ -58,7 +58,7 @@ def Dijsktra(graph, sourceV, destinationV):
                     
                     if cost < node_states[j].getCost(): #we only want to replace 'the sortest distance to NodeX' cost for a node, if its smaller than what is already stored for that node
                         node_states[j].updateCost(cost)
-                        new_pred = node_states[next_source].getPred() + list(next_source)  #adding this line so that the next line below is clearer to read. Basically, we want to think about the node we are going to next and figure out what its sortest path is. Its shortest past, will be the shortest path to the node that comes before it (which is our current source node called, next_source) plus we need to add that source node. We use the list() fn for the last term of that line because next_source is just a node but we need it be a list so that we can concatenate it/add it to that shortest path list for that previous node. 
+                        new_pred = node_states[next_source].getPred() + [next_source] #adding this line so that the next line below is clearer to read. Basically, we want to think about the node we are going to next and figure out what its sortest path is. Its shortest past, will be the shortest path to the node that comes before it (which is our current source node called, next_source) plus we need to add that source node. We use [] around the last term of that line because next_source is just a node but we need it be a list so that we can concatenate it/add it to that shortest path list for that previous node. 
                         node_states[j].updatePred(new_pred)
                     print(node_states[j]) #for debugging
                         
@@ -75,9 +75,10 @@ def Dijsktra(graph, sourceV, destinationV):
             next_source = min_heap[0][1] #now outside of the loop visiting all neighbour nodes (line 55), we want to reassign our current source node (aka next_source) to be the neighbouring node with the least cost, which will be the root node of the min heap data structure. 
             print("Next source node is ", next_source, "\n") #for debugging
                 
-    print("The shorest path from ", sourceV, " to ", destinationV, " is ", node_states[destinationV].getPred() + list(destinationV))
+    print("The shorest path from ", sourceV, " to ", destinationV, " is ", node_states[destinationV].getPred() + [destinationV])
     print("The distance from ", sourceV, " to ", destinationV, " is ", node_states[destinationV].getCost())
-    return(node_states[destinationV].getPred() + list(destinationV))
+    print("What is being returned", node_states[destinationV].getPred() + [destinationV])
+    return(node_states[destinationV].getPred() + [destinationV])
             
             
             
@@ -86,5 +87,24 @@ def Dijsktra(graph, sourceV, destinationV):
 #Dijsktra(networkGraph1,'C', 'A') #should return ['C', 'A']
 #Dijsktra({'A': {'B':2}, 'B': {'A': 2}},'B', 'A') #should return ['B', 'A']
 #Dijsktra(networkGraph2, 'A', 'E')
+#networkGraph5 = {
+    #'1': {'2':2, '3':4},
+    #'2': {'1':2, '3':3, '4':8},
+    #'3': {'1':4, '2':3, '5':5, '4':2},
+    #'4': {'2':8, '3':2, '5':11, '6': 22},
+    #'5': {'3':5, '4':11, '6':1},
+    #'6': {'4':22, '5':1}
+#}
+#Dijsktra(networkGraph5, '1', '6')
+
+#networkGraph3 = {
+    #1: {2:2, 3:4},
+    #2: {1:2, 3:3, 4:8},
+    #3: {1:4, 2:3, 5:5, 4:2},
+    #4: {2:8, 3:2, 5:11, 6: 22},
+    #5: {3:5, 4:11, 6:1},
+    #6: {4:22, 5:1}
+#}
+#Dijsktra(networkGraph3, 1, 6)
 
 
