@@ -79,7 +79,7 @@ def Dijsktra(graph, sourceV, destinationV):
                 
     trace_explained.append("The shorest path from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getPred() + [destinationV]))
     trace_explained.append("The distance from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getCost()))
-    result = (trace_explained, node_states[destinationV].getPred() + [destinationV])
+    result = (node_states[destinationV].getPred() + [destinationV], trace_explained)
     return result
             
             
