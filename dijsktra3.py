@@ -22,6 +22,8 @@ def Dijsktra(graph, sourceV, destinationV):
     """
     
     infinity = float('inf') #storing the math concept infinity into a variable called 'infinity'
+    trace_explained = []
+    trace_explained.append("Starting node is: " + str(sourceV))
     
     #creating a dictionary to store all the vertices (aka routers) in our network and its associated property values which we will need for this algo
     node_states = {} 
@@ -32,7 +34,6 @@ def Dijsktra(graph, sourceV, destinationV):
     we need the source vertex to have the starting cost value as zero, unlike the rest of the nodes which we want their starting costs to be infinity. We have already set all nodes
     to have the default cost of infinity so we have to change that for the source node now
     """
-
     node_states[sourceV].updateCost(0)  #before the period is the OBJECT associated with the key sourceV in our node_Info dict and after the period is the fn call to change its cost value
     
     #now we will create a list to collect visited nodes that we have determined are in our final route
@@ -70,20 +71,20 @@ def Dijsktra(graph, sourceV, destinationV):
         if len(min_heap) == 0 and next_source != destinationV:
             next_source = visited[-2]#return to the previous node (which is not our current source node) in our visisted list. visited[-1] would make the current node our next_source node, which is NOT what we want. we would then get stuck in an infinite loop of visiting the same node.
             visited.remove(visited[-2])
-            print("We are backtracking to node ", next_source) #for debugging
+            trace_explained.append("We are backtracking to node " + str(next_source)) #for debugging
         else:         
         ##---- above code added for that scenario ending       
             next_source = min_heap[0][1] #now outside of the loop visiting all neighbour nodes (line 55), we want to reassign our current source node (aka next_source) to be the neighbouring node with the least cost, which will be the root node of the min heap data structure. 
-            print("Next source node is ", next_source, "\n") #for debugging
+            trace_explained.append("Next source node is " + str(next_source) + "\n") #for debugging
                 
-    print("The shorest path from ", sourceV, " to ", destinationV, " is ", node_states[destinationV].getPred() + [destinationV])
-    print("The distance from ", sourceV, " to ", destinationV, " is ", node_states[destinationV].getCost())
-    print("What is being returned", node_states[destinationV].getPred() + [destinationV])
-    return(node_states[destinationV].getPred() + [destinationV])
+    trace_explained.append("The shorest path from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getPred() + [destinationV]))
+    trace_explained.append("The distance from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getCost()))
+    result = (trace_explained, node_states[destinationV].getPred() + [destinationV])
+    return result
             
             
             
-#testing GitHub, remove later
+
 #Dijsktra(networkGraph1,'A', 'F') #should return ['A', 'C', 'E', 'F']
 #Dijsktra(networkGraph1,'C', 'A') #should return ['C', 'A']
 #Dijsktra({'A': {'B':2}, 'B': {'A': 2}},'B', 'A') #should return ['B', 'A']
