@@ -25,6 +25,7 @@ def Dijsktra(graph, sourceV, destinationV):
     trace_nodes = []
     trace_text = []
     trace_text.append("Starting node is: " + str(sourceV) + "\n")
+    trace_nodes.append([sourceV])
     
     #creating a dictionary to store all the vertices (aka routers) in our network and its associated property values which we will need for this algo
     node_states = {} 
@@ -74,13 +75,19 @@ def Dijsktra(graph, sourceV, destinationV):
             next_source = visited[-2]#return to the previous node (which is not our current source node) in our visisted list. visited[-1] would make the current node our next_source node, which is NOT what we want. we would then get stuck in an infinite loop of visiting the same node.
             visited.remove(visited[-2])
             trace_text.append("We are backtracking to node " + str(next_source) + "\n") #for debugging
+            trace_nodes.append(trace_nodes[-1])
         else:         
         ##---- above code added for that scenario ending       
             next_source = min_heap[0][1] #now outside of the loop visiting all neighbour nodes (line 55), we want to reassign our current source node (aka next_source) to be the neighbouring node with the least cost, which will be the root node of the min heap data structure. 
             trace_text.append("Next 'visited' node is " + str(next_source) + "\n" + "\n") #for debugging
+            trace_nodes.append(node_states[j].getPred() + [next_source])
                 
     trace_text.append("The shorest path from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getPred() + [destinationV]) + "\n")
+    trace_nodes.append(node_states[destinationV].getPred() + [destinationV])
+
     trace_text.append("The distance from " + str(sourceV) + " to " + str(destinationV) + " is " + str(node_states[destinationV].getCost()) + "\n")
+    trace_nodes.append(trace_nodes[-1])
+
     return(trace_nodes, node_states[destinationV].getPred() + [destinationV], trace_text)
             
             
