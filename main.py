@@ -90,7 +90,16 @@ def selectSendPort():
     data.selectingSendingPort = True
 
 def selectAlgorithm():
-    data.toggleAlgorithm()
+    start = data.sendingPort
+    end = data.recievingPort
+    if data.selectedAlgorithm == "Dijsktra":
+        data.refresh()
+        data.toggleAlgorithm()
+    else:
+        data.refresh()
+    data.sendingPort = start
+    data.recievingPort = end
+    darkenNetwork()
 
 def selectRecievePort():
     if data.runAnimation:
