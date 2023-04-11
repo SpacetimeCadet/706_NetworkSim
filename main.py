@@ -92,11 +92,8 @@ def selectSendPort():
 def selectAlgorithm():
     start = data.sendingPort
     end = data.recievingPort
-    if data.selectedAlgorithm == "Dijsktra":
-        data.refresh()
-        data.toggleAlgorithm()
-    else:
-        data.refresh()
+    data.refresh()
+    data.toggleAlgorithm()
     data.sendingPort = start
     data.recievingPort = end
     darkenNetwork()
