@@ -1,4 +1,4 @@
-import dictionary as d
+import helper_functions.dictionary as d
 import pprint
 
 inf = float('inf')

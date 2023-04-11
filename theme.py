@@ -6,9 +6,9 @@ pygame.init()
 style = 1
 
 #fonts (may cut down, depending on final design)
-lightFont = 'NeueMachina-Light.otf'
-medFont = 'NeueMachina-Regular.otf'
-boldFont = 'NeueMachina-Ultrabold.otf'
+lightFont = 'resources/NeueMachina-Light.otf'
+medFont = 'resources/NeueMachina-Regular.otf'
+boldFont = 'resources/NeueMachina-Ultrabold.otf'
 
 def currentTheme():
 #Colours
@@ -20,7 +20,7 @@ def currentTheme():
             "buttonTextColour" : (18, 255, 185),
             "tableHeaderColour" : (18, 255, 185),
             "tableContentColour" : (18, 255, 185),
-            "background" : pygame.image.load("tealBackground.png")
+            "background" : pygame.image.load("resources/tealBackground.png")
         }
 
     else:
@@ -31,6 +31,6 @@ def currentTheme():
             "buttonTextColour" : (65, 184, 213),
             "tableHeaderColour" : (65, 184, 213),
             "tableContentColour" : (88, 135, 255),
-            "background" : pygame.image.load("blueBackground.png")
+            "background" : pygame.image.load("resources/blueBackground.png")
         }
 

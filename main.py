@@ -5,13 +5,13 @@ import os
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
 import pygame, sys, math, theme, datetime, random, time
-from button import Button
-from data import Data
-from textBox import TextBox
+from helper_functions.button import Button
+from helper_functions.data import Data
+from helper_functions.textBox import TextBox
 from pygame.locals import QUIT
 from network import Network
 from distance_vector import dist_vec
-from dijsktra3 import Dijsktra
+from dijsktra import Dijsktra
 
 pygame.init()
 

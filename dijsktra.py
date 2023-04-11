@@ -1,6 +1,5 @@
-from routerNode import *
+from helper_functions.routerNode import *
 from heapq import * #allows us to use heap functions in our code e.g., heapify(), heappush(), heappop(), etc. 
-from testcode import * #remove later
 
 def Dijsktra(graph, sourceV, destinationV):
     """
