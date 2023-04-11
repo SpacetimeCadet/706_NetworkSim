@@ -1,5 +1,7 @@
 import os
 
+#adjust time for animation, work in start time
+
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
 
 import pygame, sys, math, theme, datetime, random, time
@@ -102,17 +104,26 @@ def runAlgorithm():
         graph = network.toDictionary()
         if data.selectedAlgorithm == "Dijsktra":
             #convert dijsktra's "list of string" output to required list of ints
-            stringList = Dijsktra(graph, data.sendingPort.id,
-                                  data.recievingPort.id)
-            print(stringList)
-            nodeList = []
-            for node in stringList:
-                nodeList.append(int(node))
+            #stringList = Dijsktra(graph, data.sendingPort.id,
+            #                      data.recievingPort.id)
+            #print(stringList)
+            #nodeList = []
+            #for node in stringList:
+            #    nodeList.append(int(node))
+            dInfo = Dijsktra(graph, data.sendingPort.id, data.recievingPort.id)
+            data.traceList = dInfo[0]
+            nodeList = dInfo[1]
+            data.traceDescriptions = dInfo[2]
         else:
-            nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
-                                data.recievingPort.id)
+            #nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
+            #                    data.recievingPort.id)
+            bfInfo = dist_vec(network.toDictionary(), data.sendingPort.id, data.recievingPort.id)
+            data.traceList = bfInfo[0]
+            nodeList = data.traceList[-1]
+            data.traceDescriptions = bfInfo[1]
         formAnimation(nodeList)
-        data.runAnimation = True
+        data.algorithmDone = True
+        toggleAnimationButtons()
 
     else:
         text("Please select both a sending router and a receiving router",
@@ -508,6 +519,18 @@ def setupState():
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
     drawNetwork()
+    
+def toggleAnimation():
+    data.runAnimation = not data.runAnimation
+    toggleAnimationButtons()
+    
+def toggleAnimationButtons():
+    if data.runAnimation:
+            fontSize = int(width * 0.013)
+            buttons.extend([Button(width * 0.66, height * 0.18, width * 0.2, height * 0.05, fontSize, 'STOP ANIMATION', toggleAnimation)])
+    else:
+            fontSize = int(width * 0.013)
+            buttons.extend([Button(width * 0.66, height * 0.18, width * 0.2, height * 0.05, fontSize, 'RUN ANIMATION', toggleAnimation)])
 
 
 def traceState():
@@ -528,6 +551,8 @@ def traceState():
         ])
         centreNetwork()
         data.stateSetupDone = True
+        
+            
 
     #drawing panel
     pygame.draw.rect(screen, (255, 255, 255),
