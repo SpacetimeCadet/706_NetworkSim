@@ -420,8 +420,6 @@ def drawNetwork():
     for connection in connections:
         pygame.draw.line(screen, connection.colour, connection.start,
                          connection.end, 2)
-        ### TODO: use Network function:
-        #                   getWeight(connection.a, connection.b)
         text(str(connection.weight), theme.lightFont, 15,
              currentStyle.get("buttonColourLight"),
              (connection.start[0] + connection.end[0]) / 2,
@@ -505,7 +503,7 @@ def animate():
                 (stage - 1) / 2)].setColour("buttonColourDark")
             animationConnections[int(
                 (stage - 1) / 2)].setColour("buttonTextColour")
-        text("Current total weight: " + str(data.stepByStepWeight[stage]),
+        text("Current total cost: " + str(data.stepByStepWeight[stage]),
              theme.medFont, int(0.015 * width),
              currentStyle.get("buttonColourLight"), width * 0.6, height * 0.25)
         
@@ -643,7 +641,7 @@ def setupState():
              currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     elif data.choosingConnectionWeight:
         text(
-            "type in connection weight (0-100 allowed), then press enter to confirm. Press escape to cancel",
+            "type in connection cost (0-100 allowed), then press enter to confirm. Press escape to cancel",
             theme.medFont, int(0.015 * width),
             currentStyle.get("buttonColourDark"), width * 0.04, height * 0.25)
     else:
