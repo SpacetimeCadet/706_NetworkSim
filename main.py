@@ -103,18 +103,10 @@ def runAlgorithm():
     if data.sendingPort != 0 and data.recievingPort != 0:
         graph = network.toDictionary()
         if data.selectedAlgorithm == "Dijsktra":
-            #convert dijsktra's "list of string" output to required list of ints
-            #stringList = Dijsktra(graph, data.sendingPort.id,
-            #                      data.recievingPort.id)
-            #print(stringList)
-            #nodeList = []
-            #for node in stringList:
-            #    nodeList.append(int(node))
             dInfo = Dijsktra(graph, data.sendingPort.id, data.recievingPort.id)
             data.traceList = dInfo[0]
             nodeList = dInfo[1]
             data.traceDescription = dInfo[2]
-            #print(data.traceDescription)
         else:
             #nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
             #                    data.recievingPort.id)
@@ -487,6 +479,7 @@ def toggleState():
         #send drawn graph to network
         data.state = (not data.state)
         data.stateSetupDone = False
+        darkenNetwork()
         buttons.clear()
         if data.runAnimation:
             stopAnimation()
@@ -568,10 +561,10 @@ def toggleAnimation():
 def toggleAnimationButtons():
     if data.runAnimation:
             fontSize = int(width * 0.013)
-            buttons.extend([Button(width * 0.66, height * 0.18, width * 0.2, height * 0.05, fontSize, 'STOP ANIMATION', toggleAnimation)])
+            buttons.extend([Button(width * 0.75, height * 0.18, width * 0.15, height * 0.05, fontSize, 'STOP ANIMATION', toggleAnimation)])
     else:
             fontSize = int(width * 0.013)
-            buttons.extend([Button(width * 0.66, height * 0.18, width * 0.2, height * 0.05, fontSize, 'RUN ANIMATION', toggleAnimation)])
+            buttons.extend([Button(width * 0.75, height * 0.18, width * 0.15, height * 0.05, fontSize, 'RUN ANIMATION', toggleAnimation)])
 
 def nextStep():
     if data.step < len(data.traceDescription) - 1:
