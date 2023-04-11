@@ -113,17 +113,21 @@ def runAlgorithm():
             dInfo = Dijsktra(graph, data.sendingPort.id, data.recievingPort.id)
             data.traceList = dInfo[0]
             nodeList = dInfo[1]
-            data.traceDescriptions = dInfo[2]
+            data.traceDescription = dInfo[2]
+            #print(data.traceDescription)
         else:
             #nodeList = dist_vec(network.toDictionary(), data.sendingPort.id,
             #                    data.recievingPort.id)
             bfInfo = dist_vec(network.toDictionary(), data.sendingPort.id, data.recievingPort.id)
             data.traceList = bfInfo[0]
             nodeList = data.traceList[-1]
-            data.traceDescriptions = bfInfo[1]
+            data.traceDescription = bfInfo[1]
         formAnimation(nodeList)
         data.algorithmDone = True
         toggleAnimationButtons()
+        fontSize = int(width * 0.013)
+        buttons.extend([Button(width * 0.75, height * 0.7, width * 0.1, height * 0.05, fontSize, 'NEXT', nextStep)])
+        buttons.extend([Button(width * 0.15, height * 0.7, width * 0.1, height * 0.05, fontSize, 'PREVIOUS', lastStep)])
 
     else:
         text("Please select both a sending router and a receiving router",
@@ -379,9 +383,44 @@ def centreNetwork():
         connection.moveEnd(connection.end[0] - xOffset,
                            connection.end[1] - yOffset)
 
+def darkenNetwork():
+    for router in routers:
+        router.setColour("buttonColourDark")
+        
+    for connection in connections:
+        connection.turnBlack()
 
+def highlight(nodeList):
+    darkenNetwork()
+    for node in nodeList:
+        for router in routers:
+            if node == router.id:
+                router.setColour("buttonTextColour")
+    for connection in connectionsFromNodes(nodeList):
+        connection.setColour("buttonTextColour")
+    
+def connectionsFromNodes(nodeList):
+    routerList = []
+    for nodeID in nodeList:
+        for router in routers:
+            if router.id == nodeID:
+                routerList.append(router)
+                break
+            
+    connectionList = []
+    for i in range(1, len(nodeList)):
+        for connection in connections:
+            if connection.start == routerList[i-1].center or connection.end == routerList[i - 1].center:
+                if connection.start == routerList[i].center or connection.end == routerList[i].center:
+                    connectionList.append(connection)
+                    break
+    return connectionList
+
+def displayTrace(nodes, description):
+    highlight(nodes)
+    text("Step " + str(data.step + 1) + ". " + description, theme.medFont, int(0.015 * width), currentStyle.get("buttonColourDark"), width * 0.2, height * 0.25)
+    
 ### STATES ###
-
 
 def formAnimation(nodeIDs):
     #turns list of node id's into an animation
@@ -523,6 +562,8 @@ def setupState():
 def toggleAnimation():
     data.runAnimation = not data.runAnimation
     toggleAnimationButtons()
+    darkenNetwork()
+    data.step = len(data.traceDescription) + 1
     
 def toggleAnimationButtons():
     if data.runAnimation:
@@ -532,6 +573,21 @@ def toggleAnimationButtons():
             fontSize = int(width * 0.013)
             buttons.extend([Button(width * 0.66, height * 0.18, width * 0.2, height * 0.05, fontSize, 'RUN ANIMATION', toggleAnimation)])
 
+def nextStep():
+    if data.step < len(data.traceDescription) - 1:
+        data.step = data.step + 1
+    if data.step == len(data.traceDescription) - 1:
+        darkenNetwork()
+        toggleAnimationButtons()
+        data.runAnimation = True
+        
+        
+def lastStep():
+    data.runAnimation = False
+    if data.step >= len(data.traceDescription):
+        data.step = 0
+    if data.step > 0:
+        data.step = data.step - 1
 
 def traceState():
     #main state, algoritms performed on router data, state=False
@@ -582,6 +638,10 @@ def traceState():
         text("SELECTING RECIEVING PORT - click on a router", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
+        
+    if data.algorithmDone and data.step < len(data.traceDescription) -1:
+        #Issue: traceDescription = []
+        displayTrace(data.traceList[data.step], data.traceDescription[data.step])
 
     if data.runAnimation:
         animate()
