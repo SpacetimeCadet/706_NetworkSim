@@ -1,7 +1,3 @@
-###
-
-
-
 import os
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100, 100)
@@ -653,13 +649,13 @@ def traceState():
         fontSize = int(width * 0.013)
         buttons.extend([
             Button(width * 0.04, height * 0.18, width * 0.12, height * 0.05,
-                   fontSize, 'SENDING PORT', selectSendPort),
+                   fontSize, 'SENDING ROUTER', selectSendPort),
             Button(width * 0.19, height * 0.18, width * 0.14, height * 0.05,
                    fontSize, 'TOGGLE ALGORITHM', selectAlgorithm),
-            Button(width * 0.36, height * 0.18, width * 0.12, height * 0.05,
-                   fontSize, 'RECIEVING PORT', selectRecievePort),
+            Button(width * 0.36, height * 0.18, width * 0.14, height * 0.05,
+                   fontSize, 'RECIEVING ROUTER', selectRecievePort),
             Button(width * 0.51, height * 0.18, width * 0.2, height * 0.05,
-                   fontSize, 'CHANGE ROUTER DATA', toggleState),
+                   fontSize, 'CHANGE NETWORK DATA', toggleState),
             Button(width * 0.6, height * 0.8, width * 0.2, height * 0.05,
                    fontSize, 'RUN ALGORITHM', runAlgorithm)
         ])
@@ -681,19 +677,19 @@ def traceState():
         recieveID = "not selected"
     else:
         recieveID = str(data.recievingPort.id)
-    text("Sending port: " + sendID, theme.medFont, int(0.015 * width),
+    text("Sending Router: " + sendID, theme.medFont, int(0.015 * width),
          currentStyle.get("buttonTextColour"), width * 0.04, height * 0.77)
-    text("Recieving port: " + recieveID, theme.medFont, int(0.015 * width),
+    text("Recieving Router: " + recieveID, theme.medFont, int(0.015 * width),
          currentStyle.get("buttonTextColour"), width * 0.04, height * 0.8)
     text("Algorithm: " + data.selectedAlgorithm, theme.medFont,
          int(0.015 * width), currentStyle.get("buttonTextColour"),
          width * 0.04, height * 0.83)
     if data.selectingSendingPort:
-        text("SELECTING SENDING PORT - click on a router", theme.medFont,
+        text("SELECTING SENDING ROUTER - click on a router", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
     if data.selectingRecievingPort:
-        text("SELECTING RECIEVING PORT - click on a router", theme.medFont,
+        text("SELECTING RECIEVING ROUTER - click on a router", theme.medFont,
              int(0.015 * width), currentStyle.get("buttonColourDark"),
              width * 0.04, height * 0.25)
         
